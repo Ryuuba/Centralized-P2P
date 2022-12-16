@@ -1,1 +1,3 @@
 .vscode
+server/__pychache__
+*.pyc 
