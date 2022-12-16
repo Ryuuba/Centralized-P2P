@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-# Foundations of Python Network Programming, Third Edition
-# https://github.com/brandon-rhodes/fopnp/blob/m/py3/chapter03/tcp_sixteen.py
-# Simple TCP client and server that send and receive 16 octets
 import argparse
 from socket   import *
 import socket
 
-diccionario = {
+
+'''diccionario = {
   "Direccion": "",
   "Puerto": 27,
   "Estado": 1003882
-}
+    }
 print(diccionario)
+'''
 
 def recvall(sock, length):
     data = b''
@@ -38,7 +36,7 @@ def server(interface, port):
         print(' Socket peer:', sc.getpeername())
         message = recvall(sc, 16)
         print(' Incoming sixteen-octet message:', repr(message))
-        sc.sendall(b'Farewell, client')
+        sc.sendall('Farewell, client')
         sc.close()
         print(' Reply sent, socket closed')
         
@@ -54,7 +52,6 @@ def client(host, port):
 
 #172.30.5.2
 
-        
 if __name__ == '__main__':
     choices = {'client': client, 'server': server}
     parser = argparse.ArgumentParser(description='Send and receive over TCP')
