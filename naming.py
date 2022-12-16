@@ -20,7 +20,7 @@ if __name__=='__main__':
 
 #aqui HDTPM
 
-'''
+''' 
 def getUserInfo(port_number):
     print("Inserta tu nombre de usuario:")
     function = '0x02'
