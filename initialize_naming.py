@@ -1,5 +1,6 @@
 import pwinput
 import socket
+import sys
 
 """
 Este módulo se encarga de pedir al usuario su usuario y contraseña.
@@ -12,10 +13,15 @@ instalar el módulo pwinput localmente.
 #El puerto debe ser enviado como String...por ahora
 def getUserInfo(port_number):
     print("Inserta tu nombre de usuario:")
+    function = '0x02'
     nick = input();
     password = pwinput.pwinput(prompt='Inserta tu contraseña: ')
     client_info = "Servant_Equipo2"
     ip_address = socket.gethostbyname(socket.gethostname())
     port = port_number
     login_msg = " ".join([nick,password,client_info,ip_address,port])
+    #Obtaining payload size in bytes
+    length = sys.getsizeof(login_msg)
+    #Header + payload 
+    login_msg = " ".join([function,str(length),nick,password,client_info,ip_address,port])
     return(login_msg)
