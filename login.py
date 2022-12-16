@@ -16,7 +16,7 @@ def puertoDisponible(ip,port):
                 print("No se puede establecer coneccion...")
     
 ''' 
-    ## Yo tengo una sugerencia
+    ##  Yo tengo una sugerencia (OSCAR)
     puerto = 1
     while puerto <= 65535: ##Buscamos en cada puerto,disponible.
         try:
