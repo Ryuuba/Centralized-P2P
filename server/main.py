@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
-import argparse, socket, content_manager, search, login
-
-def listener():
-    pass
+import argparse
+from p2p_server import P2PServer
 
 if __name__ == '__main__':
     """Reads the options to set the server"""
@@ -16,3 +14,6 @@ if __name__ == '__main__':
     parser.add_argument('-dbp', metavar='DB_PORT', type=int, default=3306, 
             help='Database default port (default 3306)')
     args = parser.parse_args()
+    print(f'{args.p2pip}, {args.p2pp}')
+    p2p_server = P2PServer(args.p2pip, args.p2pp)
+    p2p_server.listen()
