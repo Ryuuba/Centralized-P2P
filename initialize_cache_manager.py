@@ -1,17 +1,44 @@
-from random import randint
+from threading import Thread
+import time
 
+# Se inicializa la memoria caché como una colección
+cache_manager = {}
+
+# Función que revisa el tiempo de vida de una respuesta
+def revisa_tiempo():
+    """ Esta función revisa si una respuesta ya caduco"""
+    for respuesta in list(cache_manager):
+        if cache_manager[respuesta]["Tiempo"] >= 1:
+            cache_manager[respuesta]["Tiempo"] -= 1
+        elif cache_manager[respuesta]["Tiempo"] == 0:
+            # La respuesta tiene un tiempo de vida
+            del(cache_manager[respuesta])
+
+# Función que se ejecuta de fondo para estar revisando la memoria caché
+def ciclo_infinito():
+    """ Esta soló es un ciclo infinito que revisa si una respuesta ya caduco."""
+    x = 1
+    while x >= 1:
+        revisa_tiempo()
+        # Espera 1 segundo
+        time.sleep(1)
+        
+        
 def start()->dict:
     """ Esta función inicializa la memoria caché de nuestro servent 
     argumentos:
     cache: memoria caché donde se almacenan las respuestas """
+
+    # Hilo que se ejecutara de fondo para revisar la vida de cada petición
+    thread = Thread(target=ciclo_infinito)
+    thread.daemon = True                        # El hilo muere si el hilo principal muere
+    thread.start()                              # Inicia el hilo
     
-    # Se inicializa la memoria caché como una colección
-    cacheManager = {}
     # Devuelve la memoria caché
-    return cacheManager
+    return cache_manager
 
  
-def insert(cache:dict, ip_address:str, answer:dict)->dict:
+def insert(ip_address:str, answer:dict)->dict:
     """ Esta función guarda una respuesta recibida por el servent
     su memoria caché. 
     argumentos:
@@ -20,29 +47,15 @@ def insert(cache:dict, ip_address:str, answer:dict)->dict:
     answer: respuesta que obtuvo"""
        
     # Guarda la respuesta que obtuvo y de donde la obtuvo
-    cache[ip_address] = answer
+    cache_manager[ip_address] = answer
     # Devuelve la memoria caché
-    return cache
+    return cache_manager
 
+def content():
+    """ Esta función devuelve el conenido de la memoria caché del servent."""
+    return cache_manager
 
-def search(cache:dict, peticion:dict)->tuple[dict,dict]:
-    # Busqueda
-    
-    
-    
-    # Se inicializa la respuesta
-    answer = {}
-    # Se registras los valores obtenidos (Por ahora solo guarda un texto de prueba)
-    answer["Filename"]= "filename_respuesta"
-    answer["MDS"]= "MDS_respuesta"
-    answer["Size"]= "Size_respuesta"
-    answer["Distro"]= "Distro_respuesta"
-    answer["ARCK"]= "ARCK_respuesta"
-    answer["IP"]= randint(1,100)
-    answer["Tiempo"]= randint(8,20)
-    
-    # Guarda la respuesta en la memoria caché
-    cache = insert(cache,answer["IP"],answer)
-    
-    return cache,answer
-
+def print_cache():
+    """ Esta función imprime el conenido de la memoria caché del servent."""
+    for respuesta in list(cache_manager):
+        print(cache_manager[respuesta]["Filename"],cache_manager[respuesta]["Tiempo"])
