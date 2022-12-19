@@ -12,8 +12,10 @@ import requests
 def getFile(ipAddress, filename, port):
     print('Guardando...')
     argument = 'http://' + ipAddress + ':' + port + '/' + filename
+    print("Inserta el nombre y extensión de la copia local")
+    naming = input()
     r = requests.get(argument, stream=True)
-    with open(filename, 'wb') as fd:
+    with open(naming, 'wb') as fd:
         for chunk in r.iter_content(chunk_size=128):
             fd.write(chunk)
     print('Archivo guardado correctamente.')
