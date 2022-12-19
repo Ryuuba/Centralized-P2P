@@ -23,7 +23,7 @@ class P2PServer:
         reply = NapsterMsg()
         reply.type = 0x0003
         reply.payload.append('nick@mail.com')
-        reply.length = len(reply.payload)
+        reply.length = len(''.join(reply.payload))
         return reply
 
     def compose_search_response(self, keywords: str):

@@ -24,9 +24,9 @@ class NapsterMsg:
 
     def to_bytes(self) -> bytes:
         msg = b''
-        msg += self.length.to_bytes()
-        msg += self.type.to_bytes()
-        msg += ' '.join(self.payload).encode(encoding = 'UTF-8')
+        msg += f'{self.length:04d}'.encode(encoding = 'UTF-8')
+        msg += f'{self.type:04x}'.encode(encoding = 'UTF-8')
+        msg += ''.join(self.payload).encode(encoding = 'UTF-8')
         return msg
 
     def print_type(self) -> str:
@@ -101,7 +101,7 @@ class NapsterMsg:
 
 if __name__ == '__main__':
     msg = NapsterMsg()
-    msg.length = 20
+    msg.length = 22
     msg.type = 0x0064
-    msg.payload = '002000641234567890ABCDEFGHIJ'
-    print(msg)
+    msg.payload = 'This is a 22-byte test'
+    print(msg.to_bytes())
