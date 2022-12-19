@@ -35,10 +35,10 @@ class P2PServer:
                 print(' Socket name:', connection.getsockname())
                 print(' Socket peer:', connection.getpeername())
                 msg.length = int(connection.recv(4))
-                msg.type = int(connection.recv(4))
+                msg.type = int(connection.recv(4), base=16)
                 msg.payload = self.__recvall(
                         connection, msg.length).decode('utf8') 
-                print(' message payload:', msg.payload)
+                print(' recv msg:', msg)
                 connection.sendall(b'Farewell, client')
                 connection.close()
                 print(' Reply sent, socket closed')
