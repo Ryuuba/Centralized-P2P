@@ -8,8 +8,11 @@ nombre y extensión proporcionado en el argumento.
 """
 
 import requests
+import initialize_cache_manager as cache_manager
+import buscar
 
-def getFile(ipAddress, filename, port):
+
+def getFile(ipAddress, filename, port, cache):
     print('Guardando...')
     argument = 'http://' + ipAddress + ':' + port + '/' + filename
     r = requests.get(argument, stream=True)
@@ -17,8 +20,15 @@ def getFile(ipAddress, filename, port):
         for chunk in r.iter_content(chunk_size=128):
             fd.write(chunk)
     print('Archivo guardado correctamente.')
+    
+    # Guarda el resultado de la petición
+    peticion ={}
+    cache, respuesta = buscar.search(cache, peticion)
+    
 
-"""
+# Inicializa la memoria cache
+cache = cache_manager.start()
+
 print("Inserta la dirección IP: ")
 ipAddress = input()
 print("Inserta el puerto")
@@ -27,6 +37,8 @@ while(True):
     print("Inserta el nombre del archivo")
     filename = input()
     print("Obteniendo archivo...")
-    getFile(ipAddress,filename,port)
+    getFile(ipAddress, filename, port, cache)
     print("Archivo obtenido.")
-"""
+    cache_manager.print_cache()
+
+#cache = cache_manager.content()    
