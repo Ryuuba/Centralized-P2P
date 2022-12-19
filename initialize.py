@@ -12,6 +12,7 @@ print('Iniciando en {} port {}'.format(*direccionServidor))
 #print('Escuchando en ', sock.getsockname())
 #inicio de sesion
 login.InicioSesion(direccionServidor)
+print(" ======= INICIO DE SERVANT =======")
 
 
 

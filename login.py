@@ -27,13 +27,14 @@ def InicioSesion(ip: tuple):
     while conectSucces == False:
         
         mensaje = setInfoUsuario(ip[1])
+        mensaje_encoded = mensaje.encode(encoding = 'ascii')
         #no se puede pasar la ip, se le debe de pasar el socket
         sock.connect(ip)
         try:
-            socket.sendall(bytes(mensaje, 'utf-8'))
-            response = sock.recv(16)
+            sock.sendall(mensaje_encoded)
+            response = sock.recv(1024)
         finally:
-            if response.decode('utf-8') == 'ACK':
+            if response.decode('ascii') == 'ACK':
                 conectSucces = True
             else:
                 print('No se puedo iniciar sesión. Ingresa tus datos de nuevo')
