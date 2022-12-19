@@ -13,7 +13,7 @@ instalar el módulo pwinput localmente.
 #El puerto debe ser enviado como String...por ahora
 def getUserInfo(port_number):
     print("Inserta tu nombre de usuario:")
-    function = '0x02'
+    function = '0002'
     nick = input();
     password = pwinput.pwinput(prompt='Inserta tu contraseña: ')
     client_info = "Servant_Equipo2"
