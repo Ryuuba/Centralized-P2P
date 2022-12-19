@@ -1,15 +1,16 @@
 from dataclasses import dataclass, field
 
-@dataclass(frozen=True)
+@dataclass
 class NapsterMsg:
     """
     This class models a Napster message
     """
     __payload_type: dict = field(
         default_factory = lambda: ({
-            0x0001: 'public_key',
             0x0002: 'login',
             0x0003: 'login ack', 
+            0x0010: 'req pub key',
+            0x0011: 'public_key',
             0x0064: 'notification',
             0x00C8: 'search',
             0x00C9: 'response',
@@ -19,7 +20,14 @@ class NapsterMsg:
     __max_size = 1024
     length: int = 0
     type: int = 0x0000
-    payload: list = field(default_factory=list())
+    payload: list = field(default_factory= lambda: [])
+
+    def to_bytes(self) -> bytes:
+        msg = b''
+        msg += self.length.to_bytes()
+        msg += self.type.to_bytes()
+        msg += ' '.join(self.payload).encode(encoding = 'UTF-8')
+        return msg
 
     def print_type(self) -> str:
         return self.__payload_type[self.type]
@@ -35,11 +43,11 @@ class NapsterMsg:
         except AssertionError:
             print(f' Server parser: Message type is not a request, but a response, dropping msg')
             return False
-        try:
-            assert len(self.payload) == self.length
-        except AssertionError:
-            print(f' Server parser: Message length {len(self.payload)} does not match with length parameter value {self.length}')
-            return False
+        # try:
+        #     assert len(self.payload) == 4
+        # except AssertionError:
+        #     print(f' Server parser: Message length {len(self.payload)} does not match with length parameter value {self.length}')
+        #     return False
         if self.type == 0x0002:
             return self.__parse_login()
         elif self.type == 0x0064:
@@ -89,7 +97,7 @@ class NapsterMsg:
     def __str__(self) -> str:
         return f'Message length = {self.length} bytes\n'\
             + f'Message type = {self.type:4x} ({self.__payload_type[self.type]})\n'\
-            + 'Payload: ' + self.payload
+            + 'Payload: ' + ' '.join(self.payload)
 
 if __name__ == '__main__':
     msg = NapsterMsg()

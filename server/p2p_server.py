@@ -18,6 +18,19 @@ class P2PServer:
                         % (length, len(data)))
             data += more
         return data
+
+    def compose_login_ack(self) -> NapsterMsg:
+        reply = NapsterMsg()
+        reply.type = 0x0003
+        reply.payload.append('nick@mail.com')
+        reply.length = len(reply.payload)
+        return reply
+
+    def compose_search_response(self, keywords: str):
+        pass
+
+    def save_peer_content(self, data: list[str]):
+        pass
     
     def listen(self):
         """Listens to login and client petitions"""
@@ -38,11 +51,23 @@ class P2PServer:
                 msg.type = int(connection.recv(4), base=16)
                 msg.payload = self.__recvall(
                         connection, msg.length).decode('utf8').split()
-                print(' recv msg:', msg)
-                connection.sendall(b'Farewell, client')
-                connection.close()
-                print(' Reply sent, socket closed')
+                if msg.parse():
+                    print(' recv msg:', msg)
+                    reply = None
+                    if msg.type == 0x0002:   # login msg
+                        reply = self.compose_login_ack()
+                    elif msg.type == 0x0064: # notification msg
+                        self.save_peer_content()
+                    elif msg.type == 0x00C8: # search msg
+                        reply = self.compose_search_response()
+                    if reply is not None:
+                        print(f' ACK Response: {reply.to_bytes()}')
+                        connection.sendall(reply.to_bytes())
+                        print(' Reply sent, socket closed')
+                    connection.close()
             except KeyboardInterrupt:
                 if connection:
                     connection.close()
                 break
+            except ValueError:
+                print(' Server: length or type are not integer types')
