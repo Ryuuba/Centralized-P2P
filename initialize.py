@@ -5,8 +5,9 @@ import sys
 
 #codigo del libro
 
-puerto = 36887
-direccionServidor = ('localhost', puerto)
+puerto = "36887"
+direccionServidor = ('localhost', int(puerto))
+print('Iniciando en {} port {}'.format(*direccionServidor))
 #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #print('Escuchando en ', sock.getsockname())
 #inicio de sesion

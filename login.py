@@ -14,7 +14,7 @@ def setInfoUsuario(puertito):
         naming.usuario.direccion_ip =  socket.gethostbyname(socket.gethostname())
         naming.usuario.puerto = puertito
         info = naming.usuario.usuario + naming.usuario.password + naming.usuario.direccion_ip + str(naming.usuario.puerto)
-        print(info)
+        #print("info es:" + info + "\n")
         return str(info)
 
     except ValueError as ve:
@@ -27,9 +27,10 @@ def InicioSesion(ip: tuple):
     while conectSucces == False:
         
         mensaje = setInfoUsuario(ip[1])
+        #no se puede pasar la ip, se le debe de pasar el socket
         sock.connect(ip)
         try:
-            socket.socket.sendall(bytes(mensaje, 'utf-8'))
+            socket.sendall(bytes(mensaje, 'utf-8'))
             response = sock.recv(16)
         finally:
             if response.decode('utf-8') == 'ACK':
