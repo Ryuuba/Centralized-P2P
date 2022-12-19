@@ -37,7 +37,7 @@ class P2PServer:
                 msg.length = int(connection.recv(4))
                 msg.type = int(connection.recv(4), base=16)
                 msg.payload = self.__recvall(
-                        connection, msg.length).decode('utf8') 
+                        connection, msg.length).decode('utf8').split()
                 print(' recv msg:', msg)
                 connection.sendall(b'Farewell, client')
                 connection.close()
