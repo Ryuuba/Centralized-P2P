@@ -1,5 +1,5 @@
 import socket
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from napster_msg import NapsterMsg
 
 @dataclass
