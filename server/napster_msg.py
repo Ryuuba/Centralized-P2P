@@ -10,8 +10,9 @@ class NapsterMsg:
             0x0002: 'login',
             0x0003: 'login ack', 
             0x0010: 'req pub key',
-            0x0011: 'public_key',
+            0x0011: 'ack public_key',
             0x0064: 'notification',
+            0x0066: 'notification end',
             0x00C8: 'search',
             0x00C9: 'response',
             0xFFFF: 'error'}
