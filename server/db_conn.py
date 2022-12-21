@@ -29,7 +29,40 @@ def create_connection(
     return conn
 
 def print_user_list(conn: mariadb.Connection) -> None:
-    cur = conn.cursor()
-    for nick, email in cur:
+    """Prints the user list given a DB connector. Use this function to print
+    short tables
+
+    Args:
+        conn (mariadb.Connection): _description_
+    """
+    cursor = conn.cursor()
+    for nick, email in cursor:
         print(f'{nick},\t{email}')
 
+def insert_peer_content(conn: mariadb.Connection, 
+        nickname: str,
+        distro: str,
+        version: str,
+        arch:str,
+        MD5: str,
+        size: int,
+        filename: str) -> None:
+    """Inserts a row in Content table
+
+        Args:
+            nickname (str): The client's nickname
+            ip (str): The client's host IP address
+            port (int): The port number where the client listen to HTTP requests
+            distro (str): The name of the GNU/Linux distribution
+            version (str): The version of the GNU/Linux distribution
+            arch (str): The hardware architecture compatible with the distro
+            MD5 (str): A 128-bit key that identifies the content
+            size (int): The size of the distro in bytes
+            filename (str): The filename used to request the distro
+    """
+    cursor = conn.cursor()
+    cursor.execute(
+    """INSERT INTO content (nickname,distro,ver,arch,MD5,size,filename,ip,port)\
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",(nickname,distro,version,arch,MD5,size,filename,ip,port))
+
+def remove_content()
