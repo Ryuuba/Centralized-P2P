@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS Users (
     nickname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     public_key VARCHAR(64),
     last_login INT
 );
 
-CREATE TABLE IF NOT EXISTS content (
+CREATE TABLE IF NOT EXISTS Content (
     nickname VARCHAR(255) NOT NULL,
     distro VARCHAR(255) NOT NULL,
     ver VARCHAR(255) NOT NULL,
