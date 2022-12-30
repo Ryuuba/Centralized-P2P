@@ -1,6 +1,7 @@
 import mariadb, sys
+from dataclasses import dataclass, field
 
-def create_connection(
+def __create_connection(
         password:str, database: str, user:str='root', ip: str='localhost', 
         port: int=3306) -> mariadb.Connection:
     """This function creates a Maria DB connector that may be used to create a cursor to access the database
@@ -28,41 +29,54 @@ def create_connection(
         sys.exit(1)
     return conn
 
-def print_user_list(conn: mariadb.Connection) -> None:
-    """Prints the user list given a DB connector. Use this function to print
-    short tables
+@dataclass
+class DBNapsterConnector:
+    conn = field(default_factory=__create_connection(
+        password='sistemasdistribuidos', database='napster'
+    ))
 
-    Args:
-        conn (mariadb.Connection): _description_
-    """
-    cursor = conn.cursor()
-    for nick, email in cursor:
-        print(f'{nick},\t{email}')
-
-def insert_peer_content(conn: mariadb.Connection, 
-        nickname: str,
-        distro: str,
-        version: str,
-        arch:str,
-        MD5: str,
-        size: int,
-        filename: str) -> None:
-    """Inserts a row in Content table
+    def print_user_list(self) -> None:
+        """Prints the user list given a DB connector. Use this function to print
+        short tables
 
         Args:
-            nickname (str): The client's nickname
-            ip (str): The client's host IP address
-            port (int): The port number where the client listen to HTTP requests
-            distro (str): The name of the GNU/Linux distribution
-            version (str): The version of the GNU/Linux distribution
-            arch (str): The hardware architecture compatible with the distro
-            MD5 (str): A 128-bit key that identifies the content
-            size (int): The size of the distro in bytes
-            filename (str): The filename used to request the distro
-    """
-    cursor = conn.cursor()
-    cursor.execute(
-    """INSERT INTO content (nickname,distro,ver,arch,MD5,size,filename,ip,port)\
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",(nickname,distro,version,arch,MD5,size,filename,ip,port))
+            conn (mariadb.Connection): _description_
+        """
+        cursor = self.conn.cursor()
+        for nick, email in cursor:
+            print(f'{nick},\t{email}')
 
-def remove_content()
+    def insert_peer_content(self, 
+            nickname: str,
+            distro: str,
+            version: str,
+            arch:str,
+            SHA256: str,
+            size: int,
+            filename: str) -> None:
+        """Inserts a row in Content table
+
+            Args:
+                nickname (str): The client's nickname
+                ip (str): The client's host IP address
+                port (int): The port number where the client listen to HTTP requests
+                distro (str): The name of the GNU/Linux distribution
+                version (str): The version of the GNU/Linux distribution
+                arch (str): The hardware architecture compatible with the distro
+                SHA256 (str): A 256-bit key that identifies the content
+                size (int): The size of the distro in bytes
+                filename (str): The filename used to request the distro
+        """
+        cursor = self.conn.cursor()
+        cursor.execute(
+        """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
+        VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
+        cursor.execute(
+        """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
+        VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
+
+    def remove_content(nickname: str) -> bool:
+        pass
+
+    def search_email_user(nickname: str) -> str:
+        pass
