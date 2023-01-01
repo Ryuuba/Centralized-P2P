@@ -1,7 +1,7 @@
 import mariadb, sys
 from dataclasses import dataclass, field
 
-def __create_connection(
+def _create_connection(
         password:str, database: str, user:str='root', ip: str='localhost', 
         port: int=3306) -> mariadb.Connection:
     """This function creates a Maria DB connector that may be used to create a cursor to access the database
@@ -31,7 +31,7 @@ def __create_connection(
 
 @dataclass
 class DBNapsterConnector:
-    conn = field(default_factory=__create_connection(
+    conn : mariadb.Connection = field(default_factory=_create_connection(
         password='sistemasdistribuidos', database='napster'
     ))
 
@@ -75,8 +75,11 @@ class DBNapsterConnector:
         """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
         VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
 
-    def remove_content(nickname: str) -> bool:
+    def remove_content(self, nickname: str) -> bool:
         pass
 
-    def search_email_user(nickname: str) -> str:
+    def search_email_user(self, nickname: str) -> str:
+        pass
+
+    def search_content(self, kwords: list[str]) -> list[str]:
         pass
