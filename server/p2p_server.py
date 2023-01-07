@@ -9,10 +9,14 @@ class P2PServer:
     """P2P server implementing the Napster protocol"""
     ip: str
     port: int
-    key_manager: NapsterKeyManager = field(default_factory=lambda: NapsterKeyManager())
+    __listener: socket.socket = field(default_factory=lambda: socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+    __key_manager: NapsterKeyManager = field(default_factory=lambda: NapsterKeyManager())
+
+    def save_peer_content(self, data: list[str]):
+        pass
 
     def __recvall(self, sock: socket, length: int) -> bytes:
-        """This private method receives as much bytes as the length parameter indicates
+        """Receives as much bytes as the length parameter indicates
 
         Args:
             sock (socket): A socket to receive data to the client
@@ -33,24 +37,68 @@ class P2PServer:
                         % (length, len(data)))
             data += more
         return data
+        
+    def listen(self, max: int = 1):
+        """Listens to login and client petitions"""
+        self.__listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.__listener.bind((self.ip, self.port))
+        # max length of pending connections is automatically computed
+        self.__listener.listen(max)
+        print(f'Listen on {self.ip}, {self.port}')
 
-    def save_peer_content(self, data: list[str]):
-        pass
+    def accept_connection(self):
+        while True:
+            try:
+                connection, client_address = self.__listener.accept()
+                print('Accepted connection from', client_address)
+                self.__handle_protocol(connection)
+            except KeyboardInterrupt:
+                print(' Server: program ends by CTRL+C')
+                if connection:
+                    connection.close()
+                break
 
-    def __respond_request(self, connection: socket):
-        recv_msg = napster_msg.NapsterMsg()
-        recv_msg.length = int(connection.recv(4))
-        recv_msg.type = int(connection.recv(4), base=16)
-        recv_msg.payload = self.__recvall(
-                connection, recv_msg.length).decode('utf8').split()
+
+    def __handle_protocol(self, connection: socket.socket):
+        """Handles client requests according to the Napster protocol
+
+        Args:
+            connection (socket): The socket connecting this server with a client
+        """
         try:
-            assert recv_msg.parse()
-        except AssertionError:
-            print(f' Message payload is not well-formed, dropping received message:\n{recv_msg}')
-            return
+            while True:
+                self.__respond_request(connection)
+        except EOFError:
+            print(f'handle_request: client to socket {connection.getsockname()} has closed')
+        except Exception as e:
+            print(f'Client {connection.getsockname()} error: {e}')
+        finally:
+            connection.close()
+
+    def __respond_request(self, connection: socket.socket):
+        """Sends the corresponding message to a given request. If the code message is incorrect, then the message is dropped
+
+        Args:
+            connection (socket): The socket connecting this server with a client
+        """
+        recv_msg = napster_msg.NapsterMsg()
+        msg_length = connection.recv(4)
+        if not msg_length:
+            raise EOFError(' The client has closed the socket')
+        msg_type = connection.recv(4)
+        if not msg_type:
+            raise EOFError(' Message kind is missing')
+        if not msg_length.decode('utf8').isnumeric():
+            raise ValueError(' Message length is not numeric')
+        if not msg_type.decode('utf8').isnumeric():
+            raise ValueError(' Message type is not numeric')
+        recv_msg.length = int(msg_length)
+        recv_msg.type = int(msg_type, base=16)
+        recv_msg.payload = self.__recvall(
+                    connection, recv_msg.length).decode('utf8').split()
         print(f' Received message {recv_msg}')
-        if recv_msg.type == 0x0010: #pubkey req
-            reply = napster_msg.compose_pub_key_ack(self.key_manager)
+        if recv_msg.type == 0x0010: #public key req
+            reply = napster_msg.compose_pub_key_ack(self.__key_manager)
             connection.sendall(reply.to_bytes())
             return
         elif recv_msg.type == 0x00C8: #search
@@ -65,27 +113,4 @@ class P2PServer:
         elif recv_msg.type == 0x0002: #login protocol
             print(f' login protocol not implemented, yet')
             return
-        
-    def listen(self):
-        """Listens to login and client petitions"""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((self.ip, self.port))
-        # max length of pending connections is automatically computed
-        sock.listen()
-        print(f'Listen on {self.ip}, {self.port}')
-        while True:
-            try:
-                connection, sockname = sock.accept()
-                print('We have accepted a connection from', sockname)
-                print(' Socket name:', connection.getsockname())
-                print(' Socket peer:', connection.getpeername())
-                # respond client's request
-                self.__respond_request(connection)
-                connection.close()
-            except KeyboardInterrupt:
-                if connection:
-                    connection.close()
-                break
-            except ValueError:
-                print(' Server: length or type are not integer types')
+

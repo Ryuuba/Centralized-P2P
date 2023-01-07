@@ -142,9 +142,11 @@ class NapsterMsg:
         return True  
 
     def __str__(self) -> str:
-        return f'Message length = {self.length} bytes\n'\
+        msg = f'Message length = {self.length} bytes\n'\
             + f'Message type = {self.type:4x} ({self.__payload_type[self.type]})\n'\
-            + 'Payload: ' + ' '.join(self.payload)
+            + 'Payload: '
+        msg += ' '.join(self.payload) if self.payload else 'None'
+        return msg
 
 def compose_pub_key_ack(key_manager: NapsterKeyManager) -> NapsterMsg:
     """Returns the message corresponding to a login request

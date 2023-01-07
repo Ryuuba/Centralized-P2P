@@ -17,3 +17,4 @@ if __name__ == '__main__':
     print(f'{args.p2pip}, {args.p2pp}')
     p2p_server = P2PServer(args.p2pip, args.p2pp)
     p2p_server.listen()
+    p2p_server.accept_connection()
