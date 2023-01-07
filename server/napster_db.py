@@ -1,50 +1,15 @@
 import mariadb, sys
 from dataclasses import dataclass, field
 
-def _create_connection(
-        password:str, database: str, user:str='root', ip: str='localhost', 
-        port: int=3306) -> mariadb.Connection:
-    """This function creates a Maria DB connector that may be used to create a cursor to access the database
-
-    Args:
-        password (str): the user's password to access the SQL server
-        database (str): the name of the database to connect
-        user (str, optional): The user's nick to access the SQL server. Defaults to 'root'.
-        ip (str, optional): The IP address of the SQL server. Defaults to 'localhost'.
-        port (int, optional): The number of the port identifying the SQL server. Defaults to 3306.
-
-    Returns:
-        mariadb.Connection: Object to get a database cursor
-    """
-    try:
-        conn = mariadb.connect(
-            user=user,
-            password=password,
-            host=ip,
-            port=port,
-            database=database
-        )
-    except mariadb.Error as e:
-        print(f'Error connecting to MariaDB Platform: {e}')
-        sys.exit(1)
-    return conn
-
 @dataclass
 class DBNapsterConnector:
-    conn : mariadb.Connection = field(default_factory=_create_connection(
-        password='sistemasdistribuidos', database='napster'
-    ))
-
-    def print_user_list(self) -> None:
-        """Prints the user list given a DB connector. Use this function to print
-        short tables
-
-        Args:
-            conn (mariadb.Connection): _description_
-        """
-        cursor = self.conn.cursor()
-        for nick, email in cursor:
-            print(f'{nick},\t{email}')
+    __conn : mariadb.Connection = field(default_factory=lambda: mariadb.connect(
+            user='root',
+            password='sistemasdistribuidos',
+            host='localhost',
+            port=3306,
+            database='napster')
+    )
 
     def insert_peer_content(self, 
             nickname: str,
@@ -55,7 +20,6 @@ class DBNapsterConnector:
             size: int,
             filename: str) -> None:
         """Inserts a row in Content table
-
             Args:
                 nickname (str): The client's nickname
                 ip (str): The client's host IP address
@@ -67,7 +31,7 @@ class DBNapsterConnector:
                 size (int): The size of the distro in bytes
                 filename (str): The filename used to request the distro
         """
-        cursor = self.conn.cursor()
+        cursor = self.__conn.cursor()
         cursor.execute(
         """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
         VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
@@ -78,8 +42,26 @@ class DBNapsterConnector:
     def remove_content(self, nickname: str) -> bool:
         pass
 
-    def search_email_user(self, nickname: str) -> str:
-        pass
+    def search_user_email(self, nickname: str, password: str) -> str:
+        user_email = ''
+        cursor = self.__conn.cursor()
+        cursor.execute('SELECT email FROM tblUser WHERE nickname=? AND password=?', (nickname, password))
+        result = cursor.fetchone()
+        if result:
+            user_email = result[0]
+        return user_email
 
     def search_content(self, kwords: list[str]) -> list[str]:
         pass
+
+    def insert_netw_data(self, user: str, ip: str, port: int):
+        cursor = self.__conn.cursor()
+        cursor.execute('DELETE FROM tblUserNetworkData WHERE nickname=?', 
+                (user,))
+        cursor.execute('INSERT INTO tblUserNetworkData VALUES (?, ?, ?)', 
+                (ip, port, user))
+        cursor.execute('SELECT * FROM tblUserNetworkData')
+        self.__conn.commit()
+
+    def close(self):
+        self.__conn.close()
