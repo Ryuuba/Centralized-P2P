@@ -101,12 +101,12 @@ class NapsterMsg:
             print(f' Server parser: Invalid number of fields in notification message, received {len(self.payload)}, required 6')
             return False
         try:
-            assert len(len(self.payload[1])) == 32
+            assert len(self.payload[1]) == 64
         except AssertionError:
-            print(f' Server parser: SH256 is a 32-bytes field, but only {len(self.payload[1])} are received')
+            print(f' Server parser: SH256 is a 64 hex char field, but only {len(self.payload[1])} are received')
             return False
         try:
-            int(self.parse[1], base=16)
+            int(self.payload[1], base=16)
         except ValueError:
             print(f' Server parser: SHA256 is not a numeric hash value')
             return False
