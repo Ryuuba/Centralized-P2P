@@ -2,6 +2,7 @@ import socket, napster_msg
 from dataclasses import dataclass, field
 from napster_db import DBNapsterConnector
 from napster_key_manager import NapsterKeyManager
+from protocol_exception import NotificationException, UnregisteredUserException
 
 
 @dataclass
@@ -9,6 +10,8 @@ class P2PServer:
     """P2P server implementing the Napster protocol"""
     ip: str
     port: int
+    __accept_notification : bool = False
+    __last_user : str = ''
     __listener: socket.socket = field(default_factory=lambda: socket.socket(socket.AF_INET, socket.SOCK_STREAM))
     __key_manager: NapsterKeyManager = field(default_factory=lambda: 
         NapsterKeyManager())
@@ -79,9 +82,49 @@ class P2PServer:
         except EOFError:
             print(f'handle_request: connection to {client_socket.getsockname()} has closed')
         except Exception as e:
-            print(f'Client {client_socket.getsockname()} error: {e}')
+            print(f'Client {client_socket.getsockname()} error {type(e)}: {e}')
         finally:
+            self.__accept_notification = False
+            self.__last_user = ''
             client_socket.close()
+
+    def __respond_pub_key_req(self, client_socket: socket.socket):
+        reply = napster_msg.compose_pub_key_ack(self.__key_manager)
+        client_socket.sendall(reply.to_bytes())
+
+    def __respond_login_req(self, client_socket: socket.socket, 
+            recv_msg: napster_msg.NapsterMsg):
+        user_email = self.__db_conn.search_user_email(recv_msg.payload[0], 
+                recv_msg.payload[1])
+        print(f' Received login request from {recv_msg.payload[0]} with email {user_email}')
+        print(f' Login: client implementation is {recv_msg.payload[3]}')
+        if user_email:
+            self.__db_conn.insert_netw_data(recv_msg.payload[0], 
+                    client_socket.getpeername()[0], int(recv_msg.payload[2]))
+            reply = napster_msg.compose_login_ack(user_email)
+            client_socket.sendall(reply.to_bytes())
+            self.__accept_notification = True
+            self.__last_user = recv_msg.payload[0]
+            self.__db_conn.delete_peer_content(recv_msg.payload[0])
+        else:
+            user_email = 'napster@napster.com'
+            reply = napster_msg.compose_login_ack(user_email)
+            client_socket.sendall(reply.to_bytes())
+            raise UnregisteredUserException(recv_msg.payload[0])
+
+    def __record_client_content(self, client_socket: socket.socket, 
+            recv_msg: napster_msg.NapsterMsg):
+        self.__db_conn.insert_content(
+                nickname=self.__last_user,
+                distro=recv_msg.payload[0],
+                sha256=recv_msg.payload[1],
+                size=int(recv_msg.payload[2]),
+                version=recv_msg.payload[3],
+                arch=recv_msg.payload[4])
+        self.__db_conn.insert_peer_content(
+                nickname=self.__last_user,
+                sha256=recv_msg.payload[1],
+                url=recv_msg.payload[5])
 
     def __respond_request(self, client_socket: socket.socket):
         """Sends the corresponding message to a given request. If the code message is incorrect, then the message is dropped
@@ -104,29 +147,20 @@ class P2PServer:
         recv_msg.type = int(msg_type, base=16)
         recv_msg.payload = self.__recvall(
                     client_socket, recv_msg.length).decode('utf8').split()
-        print(f' Received message\n{recv_msg}')
+        print(f'Received message\n{recv_msg}')
         assert recv_msg.parse()
         if recv_msg.type == 0x0010: # public key req
-            reply = napster_msg.compose_pub_key_ack(self.__key_manager)
-            client_socket.sendall(reply.to_bytes())
-            return
+            self.__respond_pub_key_req(client_socket)
         elif recv_msg.type == 0x0002: # login
-            db_conn = DBNapsterConnector()
-            user_email = db_conn.search_user_email(recv_msg.payload[0], 
-                    recv_msg.payload[1])
-            print(f' Received login request from {recv_msg.payload[0]} with email {user_email}')
-            print(f' Login: client implementation is {recv_msg.payload[3]}')
-            if user_email:
-                db_conn.insert_netw_data(recv_msg.payload[0], 
-                        client_socket.getpeername()[0], int(recv_msg.payload[2]))
-                reply = napster_msg.compose_login_ack(user_email)
-                client_socket.sendall(reply.to_bytes())
+            self.__respond_login_req(client_socket, recv_msg)
+        elif recv_msg.type == 0x0064: # notification
+            print('Parse notification msg is OK')
+            if not self.__accept_notification:
+                raise NotificationException(client_socket.getpeername()[0])
             else:
-                user_email = 'napster@napster.com'
-                reply = napster_msg.compose_login_ack(user_email)
-                client_socket.sendall(reply.to_bytes())
-                raise ValueError(f' User {recv_msg.payload[0]} is not registered')
-            return
+                print('Notification can be accepted')
+                self.__record_client_content(client_socket, recv_msg)
+                print('Record client content is OK')
         elif recv_msg.type == 0x00C8: # search
             # db_conn = DBNapsterConnector()
             # keyword_list = recv_msg.get_keyword_list()
