@@ -5,7 +5,6 @@ use napster;
 CREATE TABLE IF NOT EXISTS tblUser (
     nickname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    public_key VARCHAR(128),
     password VARCHAR(255) NOT NULL,
     PRIMARY KEY (nickname)
 );
@@ -14,14 +13,15 @@ CREATE TABLE IF NOT EXISTS tblContent (
     distro VARCHAR(255) NOT NULL,
     version VARCHAR(255) NOT NULL,
     arch VARCHAR(255) NOT NULL,
-    SHA256 VARCHAR(32) NOT NULL,
-    size INT NOT NULL,
+    SHA256 VARCHAR(64) NOT NULL,
+    size BIGINT NOT NULL,
+    target VARCHAR(255) NOT NULL,
     PRIMARY KEY (SHA256)
 );
 
-CREATE TABLE IF NOT EXISTS tblUserContentRelation (
+CREATE TABLE IF NOT EXISTS tblUserContent (
     nickname VARCHAR(255) NOT NULL,
-    SHA256 VARCHAR(32) NOT NULL,
+    SHA256 VARCHAR(64) NOT NULL,
     url VARCHAR(255) NOT NULL,
     FOREIGN KEY (nickname) REFERENCES tblUser(nickname),
     FOREIGN KEY (SHA256) REFERENCES tblContent(SHA256),
@@ -31,15 +31,6 @@ CREATE TABLE IF NOT EXISTS tblUserContentRelation (
 CREATE TABLE tblUserNetworkData (
     ip VARCHAR(15) NOT NULL,
     port INT NOT NULL,
-    nickname VARCHAR(255) NOT NULL,
-    FOREIGN KEY (nickname) REFERENCES tblUser (nickname)
-);
-
-CREATE TABLE tblUserStat (
-    last_login INT,
-    mean_st FLOAT,
-    min_st FLOAT,
-    max_st FLOAT,
     nickname VARCHAR(255) NOT NULL,
     FOREIGN KEY (nickname) REFERENCES tblUser (nickname)
 );
