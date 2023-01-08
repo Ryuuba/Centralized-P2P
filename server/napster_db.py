@@ -21,7 +21,7 @@ class DBNapsterConnector:
         """
         cursor = self.__conn.cursor()
         try:
-            cursor.execute('INSERT INTO tblUserContentRelation (nickname, SHA256, url) VALUES (?, ?, ?)', (nickname, sha256, url))
+            cursor.execute('INSERT INTO tblUserContent (nickname, SHA256, url) VALUES (?, ?, ?)', (nickname, sha256, url))
             self.__conn.commit()
             print(f'Napster DB connector: Insert peer content from {nickname} is OK')
         except mariadb.IntegrityError:
@@ -29,7 +29,7 @@ class DBNapsterConnector:
 
 
     def insert_content(self, nickname: str, distro: str, version: str, arch:str,
-            sha256: str, size: int) -> None:
+            sha256: str, size: int, target: str) -> None:
         """Inserts a row in Content table
             Args:
                 distro (str): The name of the GNU/Linux distribution
@@ -37,13 +37,14 @@ class DBNapsterConnector:
                 arch (str): The hardware architecture compatible with the distro
                 SHA256 (str): A 256-bit key that identifies the content
                 size (int): The size of the distro in bytes
+                target (str): The kind of supported hardware, e.g., server o workstation
         """
         cursor = self.__conn.cursor()
         try:
             cursor.execute(
-            'INSERT INTO tblContent (distro, version, arch, SHA256, size) VALUES (?, ?, ?, ?, ?)',(distro, version, arch, sha256, size))
+            'INSERT INTO tblContent (distro, version, arch, SHA256, size, target) VALUES (?, ?, ?, ?, ?, ?)',(distro, version, arch, sha256, size, target))
             self.__conn.commit()
-            print(f'Napster DB Connentor: Insert new content from {nickname} is OK')
+            print(f'Napster DB Connector: Insert new content from {nickname} is OK')
         except mariadb.IntegrityError:
             print(f'Napster Database connector:\n distro: {distro}\n with SHA256 key {sha256} is already registered')
 
@@ -71,7 +72,7 @@ class DBNapsterConnector:
     # TODO: delete content when no peer shares it
     def delete_peer_content(self, user: str):
         cursor = self.__conn.cursor()
-        cursor.execute('DELETE FROM tblUserContentRelation WHERE nickname=?', (user,))
+        cursor.execute('DELETE FROM tblUserContent WHERE nickname=?', (user,))
         self.__conn.commit()
 
     def close(self):

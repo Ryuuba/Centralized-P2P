@@ -96,9 +96,9 @@ class NapsterMsg:
         
     def __parse_notification(self) -> bool:
         try:
-            assert len(self.payload) == 6
+            assert len(self.payload) == 7
         except AssertionError:
-            print(f' Server parser: Invalid number of fields in notification message, received {len(self.payload)}, required 6')
+            print(f'Server parser:\n Invalid number of fields in notification message,\n received {len(self.payload)},\n required 7: (distro, SHA256, size, version, arch, target, url)')
             return False
         try:
             assert len(self.payload[1]) == 64
@@ -114,15 +114,7 @@ class NapsterMsg:
             int(self.payload[2])
         except ValueError:
             print(f' Server parser: Size is not a numeric value')
-        return True
-
-    def __parse_notification_end(self) -> bool:
-        try:
-            assert len(self.payload) == 0
-        except AssertionError:
-            print(f' Server parser: Notification end message must not have any payload')
-            return False
-        return True        
+        return True    
 
     def __parse_search(self) -> None:
         try:

@@ -120,11 +120,12 @@ class P2PServer:
                 sha256=recv_msg.payload[1],
                 size=int(recv_msg.payload[2]),
                 version=recv_msg.payload[3],
-                arch=recv_msg.payload[4])
+                arch=recv_msg.payload[4],
+                target=recv_msg.payload[5])
         self.__db_conn.insert_peer_content(
                 nickname=self.__last_user,
                 sha256=recv_msg.payload[1],
-                url=recv_msg.payload[5])
+                url=recv_msg.payload[6])
 
     def __respond_request(self, client_socket: socket.socket):
         """Sends the corresponding message to a given request. If the code message is incorrect, then the message is dropped
@@ -158,9 +159,7 @@ class P2PServer:
             if not self.__accept_notification:
                 raise NotificationException(client_socket.getpeername()[0])
             else:
-                print('Notification can be accepted')
                 self.__record_client_content(client_socket, recv_msg)
-                print('Record client content is OK')
         elif recv_msg.type == 0x00C8: # search
             # db_conn = DBNapsterConnector()
             # keyword_list = recv_msg.get_keyword_list()
