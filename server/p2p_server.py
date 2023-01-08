@@ -18,9 +18,6 @@ class P2PServer:
     __db_conn: DBNapsterConnector = field(default_factory=lambda: 
         DBNapsterConnector())
 
-    def save_peer_content(self, data: list[str]):
-        pass
-
     def __recvall(self, sock: socket, length: int) -> bytes:
         """Receives as much bytes as the length parameter indicates
 
@@ -160,7 +157,7 @@ class P2PServer:
                 raise NotificationException(client_socket.getpeername()[0])
             else:
                 self.__record_client_content(client_socket, recv_msg)
-        elif recv_msg.type == 0x00C8: # search
+        elif recv_msg.type == 0x00C8: # TODO implement search
             # db_conn = DBNapsterConnector()
             # keyword_list = recv_msg.get_keyword_list()
             # result_list = db_conn.search_content(keyword_list)
