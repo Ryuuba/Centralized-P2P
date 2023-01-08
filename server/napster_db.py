@@ -11,36 +11,41 @@ class DBNapsterConnector:
             database='napster')
     )
 
-    def insert_peer_content(self, 
-            nickname: str,
-            distro: str,
-            version: str,
-            arch:str,
-            SHA256: str,
-            size: int,
-            filename: str) -> None:
+    def insert_peer_content(self, nickname: str, sha256: str, url: str):
+        """Inserts a row in UserContent table
+
+        Args:
+            nickname (str): the nickname of the napster client
+            SHA256 (str): the SHA256 key of the linux ISO (hex format)
+            url (str): The URL to get the linux ISO via HTTP
+        """
+        cursor = self.__conn.cursor()
+        try:
+            cursor.execute('INSERT INTO tblUserContentRelation (nickname, SHA256, url) VALUES (?, ?, ?)', (nickname, sha256, url))
+            self.__conn.commit()
+            print(f'Napster DB connector: Insert peer content from {nickname} is OK')
+        except mariadb.IntegrityError:
+            print(f'Napster Database connector:\n file: {url}\n from user {nickname} is already registered')
+
+
+    def insert_content(self, nickname: str, distro: str, version: str, arch:str,
+            sha256: str, size: int) -> None:
         """Inserts a row in Content table
             Args:
-                nickname (str): The client's nickname
-                ip (str): The client's host IP address
-                port (int): The port number where the client listen to HTTP requests
                 distro (str): The name of the GNU/Linux distribution
                 version (str): The version of the GNU/Linux distribution
                 arch (str): The hardware architecture compatible with the distro
                 SHA256 (str): A 256-bit key that identifies the content
                 size (int): The size of the distro in bytes
-                filename (str): The filename used to request the distro
         """
         cursor = self.__conn.cursor()
-        cursor.execute(
-        """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
-        VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
-        cursor.execute(
-        """INSERT INTO tblContent (distro,version,arch,SHA256,size)\
-        VALUES (?, ?, ?, ?, ?)""",(distro,version,arch,SHA256,size))
-
-    def remove_content(self, nickname: str) -> bool:
-        pass
+        try:
+            cursor.execute(
+            'INSERT INTO tblContent (distro, version, arch, SHA256, size) VALUES (?, ?, ?, ?, ?)',(distro, version, arch, sha256, size))
+            self.__conn.commit()
+            print(f'Napster DB Connentor: Insert new content from {nickname} is OK')
+        except mariadb.IntegrityError:
+            print(f'Napster Database connector:\n distro: {distro}\n with SHA256 key {sha256} is already registered')
 
     def search_user_email(self, nickname: str, password: str) -> str:
         user_email = ''
@@ -61,6 +66,12 @@ class DBNapsterConnector:
         cursor.execute('INSERT INTO tblUserNetworkData VALUES (?, ?, ?)', 
                 (ip, port, user))
         cursor.execute('SELECT * FROM tblUserNetworkData')
+        self.__conn.commit()
+
+    # TODO: delete content when no peer shares it
+    def delete_peer_content(self, user: str):
+        cursor = self.__conn.cursor()
+        cursor.execute('DELETE FROM tblUserContentRelation WHERE nickname=?', (user,))
         self.__conn.commit()
 
     def close(self):
