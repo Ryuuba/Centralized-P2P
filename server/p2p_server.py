@@ -7,7 +7,18 @@ from protocol_exception import NotificationException, UnregisteredUserException
 
 @dataclass
 class P2PServer:
-    """P2P server implementing the Napster protocol"""
+    """Class that implement the Napster protocol (serve side)
+
+    Attributes:
+        ip (str): The IP address to bind the P2P server
+        port (str): The port number to listen client's queries
+
+    Raises:
+        EOFError: Raised when the client buffer is empty
+        UnregisteredUserException: Raised when an unregister user tries to log in
+        ValueError: Raised when the payload of a message is not numeric
+        NotificationException: Raised when a user tries to notify content without log in
+    """    
     ip: str
     port: int
     __accept_notification : bool = False
@@ -42,7 +53,11 @@ class P2PServer:
         return data
         
     def listen(self, max: int = 1):
-        """Listens to login and client petitions"""
+        """Listens to login and client petitions
+
+        Args:
+            max (int, optional): Maximum number of queued connections. Defaults to 1.
+        """        
         self.__listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__listener.bind((self.ip, self.port))
         # max length of pending connections is automatically computed
@@ -50,6 +65,8 @@ class P2PServer:
         print(f'Listen on {self.ip}, {self.port}')
 
     def accept_connection(self):
+        """Handles new connections and received CTRL+C signal to close the server program
+        """        
         client_socket = None
         client_address = None
         while True:
@@ -69,8 +86,8 @@ class P2PServer:
         """Handles client requests according to the Napster protocol
 
         Args:
-            client_socket (socket): The socket connecting this server with a client
-        """
+            client_socket (socket.socket): The socket connecting this server with a client
+        """        
         try:
             while True:
                 self.__respond_request(client_socket)
@@ -86,11 +103,23 @@ class P2PServer:
             client_socket.close()
 
     def __respond_pub_key_req(self, client_socket: socket.socket):
+        """Composes a message encapsulating the public RSA key of this server
+            client_socket (socket.socket): The socket to send the public RSA key
+        """        
         reply = napster_msg.compose_pub_key_ack(self.__key_manager)
         client_socket.sendall(reply.to_bytes())
 
     def __respond_login_req(self, client_socket: socket.socket, 
             recv_msg: napster_msg.NapsterMsg):
+        """Composes a message encapsulating the email of a registered user or a dummy email
+
+        Args:
+            client_socket (socket.socket): The socket to send the answer to the login request
+            recv_msg (napster_msg.NapsterMsg): The client's request (login msg)
+
+        Raises:
+            UnregisteredUserException: Raised when the user is not registered in the napster database
+        """        
         user_email = self.__db_conn.search_user_email(recv_msg.payload[0], 
                 recv_msg.payload[1])
         print(f' Received login request from {recv_msg.payload[0]} with email {user_email}')
@@ -124,12 +153,22 @@ class P2PServer:
                 sha256=recv_msg.payload[1],
                 url=recv_msg.payload[6])
 
-    def __respond_request(self, client_socket: socket.socket):
         """Sends the corresponding message to a given request. If the code message is incorrect, then the message is dropped
 
         Args:
             client_socket (socket): The socket connecting this server with a client
         """
+    def __respond_request(self, client_socket: socket.socket):
+        """Sends the corresponding message to a given request. If the code message is incorrect, then the message is dropped
+
+        Args:
+            client_socket (socket.socket): The socket connecting this server with a client
+
+        Raises:
+            EOFError: Raised when the client buffer is empty
+            ValueError: Raised when a field in the payload is not numeric
+            NotificationException: Raised when a notification message is received before a login request
+        """    
         recv_msg = napster_msg.NapsterMsg()
         msg_length = client_socket.recv(4)
         if not msg_length:
