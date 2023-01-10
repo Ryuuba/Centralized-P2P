@@ -2,12 +2,21 @@ import initialize_login
 import client
 import server
 import socket
-import sys
 import threading
 import time
 
+"""
+TODO:
+    -Check that generated message follows established format
+    -Check that current serialization works with server
+    -Generate servent keys and send public key to central server (?)
+        -Which code is used when servent sends its public key to the central server? Does sservent needs to gen/send key at all?
+    -Integrate this code with other modules and test login process together with service advertisement
+    -Implement answer message parsing
+"""
+
 def run_server(route):
-    #Should the port number assigned to server be reported back somewhere?
+    #HTTP server port number should be reported back to server
     print("Inciando servidor...")
     server.mountServer(route)
 
@@ -16,10 +25,12 @@ def run_server(route):
 #Another thread executes this servent's server
 thread = threading.Thread(target=run_server, args=("/run/media/cardcathouse/",))
 thread.start()
-
 #Socket creation
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-port = "49999"
+#This port number is central server's listening port
+port = "6699"
+time.sleep(1)
+#As central server is run on the same machine as the servent, localhost should work. TODO: ask how this will work on production
 server_address = ('localhost', int(port))
 initialize_login.loginToSystem(sock, server_address,port)
 print("Bienvenido al sistema de distribución de imagenes de Linux")

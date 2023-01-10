@@ -15,11 +15,13 @@ import functools
 def mountServer(directory):
     hostname='localhost' #this might change, need to check
     dir = abspath(directory)
-    print(directory)
+    print("Montando servidor en directorio: ", directory)
     Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=dir)
-    httpd = http.server.HTTPServer((hostname, 0), Handler, False)
+    #Server will always use port 49999
+    httpd = http.server.HTTPServer((hostname, 49999), Handler, False)
     httpd.server_bind()
     address="http://%s:%d" % (httpd.server_name, httpd.server_port)
+    print(httpd.server_address[0])
     print("Servidor escuchando en :", address)
     httpd.server_activate()
     httpd.serve_forever()

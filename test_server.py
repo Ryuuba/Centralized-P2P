@@ -2,7 +2,7 @@ import socket
 import sys
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('localhost', 49999)
+server_address = ('localhost', 6699)
 print('starting up on {} port {}'.format(*server_address))
 sock.bind(server_address)
 sock.listen(1)
