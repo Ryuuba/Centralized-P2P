@@ -9,8 +9,6 @@ import time
 TODO:
     -Check that generated message follows established format
     -Check that current serialization works with server
-    -Generate servent keys and send public key to central server (?)
-        -Which code is used when servent sends its public key to the central server? Does sservent needs to gen/send key at all?
     -Integrate this code with other modules and test login process together with service advertisement
     -Implement answer message parsing
 """
@@ -24,21 +22,54 @@ def run_server(route):
 
 #Another thread executes this servent's server
 thread = threading.Thread(target=run_server, args=("/run/media/cardcathouse/",))
+
+#Server starts
 thread.start()
+
 #Socket creation
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 #This port number is central server's listening port
 port = "6699"
+#Sleep for one second so serevent's server information can be displayed correctly
 time.sleep(1)
+
 #As central server is run on the same machine as the servent, localhost should work. TODO: ask how this will work on production
 server_address = ('localhost', int(port))
 initialize_login.loginToSystem(sock, server_address,port)
 print("Bienvenido al sistema de distribución de imagenes de Linux")
+
 #After successful login, should execute initialize_servicead
 
-#After service advertisement, client runs until user quits program.
-#When run on cluster, this could be rank 0
 
+#After service advertisement, client shows menu and runs until user quits program
+choice = 1
+while(choice != 2):
+    print("Elige una operación\n1. Buscar una imagen\n2. Cerrar sesión")
+    choice = input()
+    if choice == 1:
+        print("Inserta el nombre de la distribución que quieres encontrar:")
+        distro = input()
+        #TODO: search and fetch
+        print("El archivo se descargó correctamente.\n¿Quieres seguir usando el sistema? (s/n)" )
+        choice2 = input()
+        if input == "n":
+            print("Cerrando sesión y apagando el servidor HTTP...")
+            thread.join()
+            choice = 2
+    elif choice == 2:
+        print("Cerrando sesión y apagando el servidor HTTP...")
+        thread.join()
+    else:
+        print("La opción introducida no es válida.")
+
+#Another thread should continously probe shared folder for any changes
+#When a change is detected, servent logs in to server and redoes service advertisement
+
+
+
+"""
+#This code is used to test this servent's HTTP server
 print("Inserta la dirección IP del servidor: ")
 ipAddress = input()
 print("Inserta el puerto del servidor:")
@@ -59,3 +90,4 @@ while(choice == '1'):
         #Assuming the whole system shuts down when user quits client
         thread.join()
         break
+"""

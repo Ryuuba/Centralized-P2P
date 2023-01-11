@@ -4,8 +4,8 @@ import sys
 
 """
 Este módulo se encarga de pedir al usuario su usuario y contraseña.
-El módulo obtiene la dirección IP y el número de socket del equipo que está
-ejecutando el servant. Esta información se junta en un sólo mensaje que se pasa
+El módulo obtiene la dirección IP y el número de socket del servidor 
+HTTP del servent. Esta información se junta en un sólo mensaje que se pasa
 como una cadena de texto al módulo initialize_login. Este último invoca a este módulo
 para obtener el mensaje. Puede que sea necesario ejecutar pip install pwinput para
 instalar el módulo pwinput localmente.
@@ -31,7 +31,8 @@ def getUserInfo(port_number):
     port = str(port_number)
     login_msg = " ".join([nick,password,port,client_info])
     #Obtaining payload size in bytes
-    length = sys.getsizeof(login_msg)
+    length = len(login_msg)
     #Header + payload 
     final_login_msg = '00' + str(length) + function + login_msg
-    return(final_login_msg)
+    print(final_login_msg)
+    return(final_login_msg.rstrip())
