@@ -171,9 +171,11 @@ class P2PServer:
         """    
         recv_msg = napster_msg.NapsterMsg()
         msg_length = client_socket.recv(4)
+        print(f'Server: message length is {msg_length}')
         if not msg_length:
             raise EOFError(' The client has closed the socket')
         msg_type = client_socket.recv(4)
+        print(f'Server: message type is{msg_type}')
         if not msg_type:
             raise EOFError(f' Message kind is missing')
         if not msg_length.decode('utf8').isnumeric():
