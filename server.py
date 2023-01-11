@@ -24,4 +24,4 @@ def mountServer(port,directory):
     httpd.server_activate()
     httpd.serve_forever()
 
-mountServer(49999, '/Users/jesgu/OneDrive/Escritorio/server-mario')
+mountServer(49999, '/Users/Jesus/Desktop/archivosCompartidos')

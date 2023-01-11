@@ -14,7 +14,7 @@ instalar el módulo pwinput localmente.
 def getUserInfo(port_number):
     print("Inserta tu nombre de usuario:")
     function = '0002'
-    nick = input();
+    nick = input()
     password = pwinput.pwinput(prompt='Inserta tu contraseña: ')
     client_info = "Servant_Equipo2"
     ip_address = socket.gethostbyname(socket.gethostname())
