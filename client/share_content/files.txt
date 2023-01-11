@@ -1,0 +1,4 @@
+Fedora 2037372928 37-1.7 x86_64 Workstation Fedora-Workstation-Live-x86_64-37-1.7.iso
+Ubuntu 3826831360 22.04.1 AMD64 Desktop ubuntu-22.04.1-desktop-amd64.iso
+Raspberry 2831677672 PiOS ARM32 RaspberryPiBoard raspios-bullseye-armhf-full.img.xz
+PopOS 3134275584 22.04 AMD64 Nvidia-Desktop pop-os_22.04_amd64_nvidia_20.iso

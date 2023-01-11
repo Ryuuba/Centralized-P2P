@@ -1,1 +1,1 @@
-printf "00260002alex alex0000 20041 netcat" | nc -q 0 localhost 6699
+printf "00260002alex alex0000 20041 netcat" | ncat localhost 6699

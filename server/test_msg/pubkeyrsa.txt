@@ -1,1 +1,1 @@
-printf "00000010" | nc -q 0 localhost 6699
+printf "00000010" | ncat localhost 6699
