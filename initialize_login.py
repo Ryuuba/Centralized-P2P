@@ -10,7 +10,7 @@ servidor. Si envía un reconocimiento del inicio de sesión, se ha entrado al si
 y se termina el programa. En caso de que se mande un error, se le pedirá al usuario ingresar sus datos
 de nuevo.
 """
-def loginToSystem(sock: socket, server_address: tuple, port):
+def loginToSystem(sock: socket, server_address: tuple):
     connectionAck = False
     while connectionAck == False:
         loginSock = sock

@@ -22,7 +22,9 @@ def run_server(route):
 #One thread should be executing initialize_cacheman
 
 #Another thread executes this servent's server
-thread = threading.Thread(target=run_server, args=("/run/media/cardcathouse/",))
+print("Inserta la ruta del directorio que será usado para montar el servidor HTTP")
+serverDirMount = input()
+thread = threading.Thread(target=run_server, args=(serverDirMount,))
 
 #Server starts
 thread.start()
