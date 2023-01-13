@@ -79,29 +79,3 @@ while(choice != "2"):
 
 #Another thread should continously probe shared folder for any changes
 #When a change is detected, servent logs in to server and redoes service advertisement
-
-
-
-"""
-#This code is used to test this servent's HTTP server
-print("Inserta la dirección IP del servidor: ")
-ipAddress = input()
-print("Inserta el puerto del servidor:")
-port = input()
-choice = '1'
-while(choice == '1'):
-    print("Selecciona una opción:\n1. Obtener un archivo\n2.Salir")
-    choice = input()
-    if choice == '1':
-            print("Inserta el nombre del archivo que quieres obtener: ")
-            filename = input()
-            print("Obteniendo archivo....")
-            #For now we assume user will always input an existing file, and that there will be no errors in sending and receiving the file
-            client.getFile(ipAddress, filename, port)
-            print("Archivo obtenido de manera exitosa.")
-    else:
-        print("Saliendo del sistema...")
-        #Assuming the whole system shuts down when user quits client
-        thread.join()
-        break
-"""

@@ -24,7 +24,6 @@ def loginToSystem(sock: socket, server_address: tuple, port):
             #TODO: analyze message similarly to how server does it
             if response.decode('utf-8') == '00190003napster@napster.com':
                 connectionAck = False
-                #loginSock.close()
                 print('No se puedo iniciar sesión. Ingresa tus datos de nuevo')
                 loginSock.close()
             else:
