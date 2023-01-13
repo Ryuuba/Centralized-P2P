@@ -10,18 +10,18 @@ from functools import partial
 from os.path import abspath
 import functools
 
-#doesn't use provided port number...
-def mountServer(port,directory):
+#An available pórt is assigned to the server automatically.
+#Client and server should use different ports. 
+def mountServer(directory):
     hostname='localhost' #this might change, need to check
     dir = abspath(directory)
-    print(directory)
+    print("Montando servidor en directorio: ", directory)
     Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=dir)
-    httpd = http.server.HTTPServer((hostname, 0), Handler, False)
-    print("server about to bind to port %d on hostname '%s'" % (port, hostname))
+    #Server will always use port 49999
+    httpd = http.server.HTTPServer((hostname, 49999), Handler, False)
     httpd.server_bind()
     address="http://%s:%d" % (httpd.server_name, httpd.server_port)
-    print("server about to listen on:", address)
+    print(httpd.server_address[0])
+    print("Servidor escuchando en :", address)
     httpd.server_activate()
     httpd.serve_forever()
-
-mountServer(49999, '/Users/Jesus/Desktop/archivosCompartidos')
