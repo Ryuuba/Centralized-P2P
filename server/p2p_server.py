@@ -175,13 +175,13 @@ class P2PServer:
         if not msg_length:
             raise EOFError(' The client has closed the socket')
         msg_type = client_socket.recv(4)
-        print(f'Server: message type is{msg_type}')
+        print(f'Server: message type is {msg_type}')
         if not msg_type:
             raise EOFError(f' Message kind is missing')
         if not msg_length.decode('utf8').isnumeric():
             raise ValueError(f' Message length is not numeric {msg_length}')
-        if not msg_type.decode('utf8').isnumeric():
-            raise ValueError(f' Message type is not numeric {msg_length}')
+        if not msg_type.decode('utf8').isalnum():
+            raise ValueError(f' Message type is not numeric {msg_type}')
         recv_msg.length = int(msg_length)
         recv_msg.type = int(msg_type, base=16)
         recv_msg.payload = self.__recvall(

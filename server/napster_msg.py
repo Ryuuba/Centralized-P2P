@@ -118,14 +118,9 @@ class NapsterMsg:
 
     def __parse_search(self) -> None:
         try:
-            assert len(self.payload) >= 2 and len(self.payload) < 5
+            assert len(self.payload) == 1
         except AssertionError:
-            print(f' Server parser: Search message payload must have between two and four fields, actual number of fields equals {len(self.payload)}')
-            return False
-        try:
-            int(self.payload[1], base=10)
-        except ValueError:
-            print(f' Server parser: max result field is not numeric, dropping message')
+            print(f' Server parser: Search message payload must have only one keyword, actual number of fields equals {len(self.payload)}')
             return False
         return True  
 
