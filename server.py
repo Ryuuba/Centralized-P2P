@@ -10,7 +10,7 @@ from functools import partial
 from os.path import abspath
 import functools
 
-#An available pórt is assigned to the server automatically.
+#An available port is assigned to the server automatically.
 #Client and server should use different ports. 
 def mountServer(directory):
     hostname='localhost' #this might change, need to check
