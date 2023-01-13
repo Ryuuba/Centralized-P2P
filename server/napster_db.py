@@ -57,8 +57,13 @@ class DBNapsterConnector:
             user_email = result[0]
         return user_email
 
-    def search_content(self, kwords: list[str]) -> list[str]:
-        pass
+    def search_content(self, kword: str) -> list[str]:
+        resultado = ''
+        cursor = self.__conn.cursor()
+        cursor.execute('SELECT * FROM tblcontent WHERE distro=?', (kword,))
+        result = cursor.fetchone()
+        resultado = result[0]
+        return resultado
 
     def insert_netw_data(self, user: str, ip: str, port: int):
         cursor = self.__conn.cursor()

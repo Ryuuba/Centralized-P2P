@@ -116,7 +116,7 @@ class NapsterMsg:
             print(f' Server parser: Size is not a numeric value')
         return True    
 
-    def __parse_search(self) -> None:
+    def __parse_search(self) -> bool:
         try:
             assert len(self.payload) >= 2 and len(self.payload) < 5
         except AssertionError:
@@ -127,7 +127,7 @@ class NapsterMsg:
         except ValueError:
             print(f' Server parser: max result field is not numeric, dropping message')
             return False
-        return True  
+        return True
 
     def __str__(self) -> str:
         msg = f'Message length = {self.length} bytes\n'\
@@ -160,8 +160,17 @@ def compose_login_ack(user_email: str) -> NapsterMsg:
     reply.length = len(''.join(reply.payload))
     return reply
 
-def compose_search_response(keywords: str):
-    pass
+def compose_search_response(keyword: str):
+    """Returns the message corresponding to a search request
+
+    Returns:
+        NapsterMsg: A message that contains the search results
+    """
+    reply = NapsterMsg()
+    reply.type = 0x00C9
+    reply.payload.append(keyword)
+    reply.length = len(''.join(reply.payload))
+    return reply
 
 if __name__ == '__main__':
     msg = NapsterMsg()

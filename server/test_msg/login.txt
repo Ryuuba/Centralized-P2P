@@ -1,1 +1,2 @@
 printf "00260002alex alex0000 20041 netcat" | ncat localhost 6699
+printf "000600C8Fedora" | ncat localhost 6699
