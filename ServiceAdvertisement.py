@@ -87,12 +87,10 @@ class ServiceAdvertisement:
                         while element != "-" or "_" and doneName == False:
                             distroName = distroName + element
                         doneName = True
-                        if element.isnumeric():
+                        while element.isnumeric() or element == '.' and doneVersion == False:
                             versionNumber = versionNumber + element
-                        
+                        doneVersion == True
 
-
-                            
                     metadatos = file.split("-");
                     print(metadatos)
                     distro = metadatos[0]
@@ -125,10 +123,3 @@ for elemento in lista:
     print(elemento)
  
 #files.sendServer("localhost",3333)
-
-
-
-
-
-
-
