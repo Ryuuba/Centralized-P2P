@@ -3,6 +3,7 @@ import server
 import socket
 import threading
 import time
+import ServiceAdvertisement
 
 """
 TODO:
@@ -20,6 +21,7 @@ def run_server(route):
 
 #Another thread executes this servent's server
 print("Inserta la ruta del directorio que será usado para montar el servidor HTTP")
+#This will also be used for service advertismenet
 serverDirMount = input()
 thread = threading.Thread(target=run_server, args=(serverDirMount,))
 
