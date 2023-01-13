@@ -18,14 +18,15 @@ def loginToSystem(sock: socket, server_address: tuple, port):
         #Server always uses port 49999
         loginInfoMsg = initialize_naming.getUserInfo(49999)
         try:
-            print(bytes(loginInfoMsg, 'utf-8'))
             loginSock.sendall(bytes(loginInfoMsg, 'utf-8'))
             response = loginSock.recv(50)
         finally:
+            #TODO: analyze message similarly to how server does it
             if response.decode('utf-8') == '00190003napster@napster.com':
                 connectionAck = False
                 #loginSock.close()
                 print('No se puedo iniciar sesión. Ingresa tus datos de nuevo')
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                loginSock.close()
             else:
                 connectionAck = True
+    return connectionAck

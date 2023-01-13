@@ -34,5 +34,4 @@ def getUserInfo(port_number):
     length = len(login_msg)
     #Header + payload 
     final_login_msg = '00' + str(length) + function + login_msg
-    print(final_login_msg)
-    return(final_login_msg.rstrip())
+    return final_login_msg
