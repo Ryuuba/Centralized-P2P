@@ -1,5 +1,6 @@
 import os
 import hashlib
+import db
 
 if __name__ == '__main__':
         
@@ -34,3 +35,6 @@ if __name__ == '__main__':
     
     # Execute the login line in terminal
     os.system(login_msg)
+    
+    resultados = db.search_content("Fedora")
+    print(resultados)
