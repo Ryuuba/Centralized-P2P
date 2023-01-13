@@ -197,12 +197,12 @@ class P2PServer:
             else:
                 self.__record_client_content(client_socket, recv_msg)
         elif recv_msg.type == 0x00C8: # TODO implement search
-            db_conn = DBNapsterConnector()
+            """db_conn = DBNapsterConnector()
             keyword_list = recv_msg.get_keyword_list()
             result_list = db_conn.search_content(keyword_list)
             for result in result_list:
                 reply = napster_msg.compose_response(result)
-                client_socket(reply.to_bytes())
+                client_socket(reply.to_bytes())"""
                 
             print(f' search protocol not implemented, yet')
             return
