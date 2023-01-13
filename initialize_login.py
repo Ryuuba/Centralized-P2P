@@ -11,16 +11,22 @@ y se termina el programa. En caso de que se mande un error, se le pedirá al usu
 de nuevo.
 """
 def loginToSystem(sock: socket, server_address: tuple, port):
-    connectionAck= False
+    connectionAck = False
     while connectionAck == False:
-        loginInfoMsg = initialize_naming.getUserInfo(port)
         loginSock = sock
         loginSock.connect(server_address)
+        #Server always uses port 49999
+        loginInfoMsg = initialize_naming.getUserInfo(49999)
         try:
             loginSock.sendall(bytes(loginInfoMsg, 'utf-8'))
-            response = loginSock.recv(16)
+            response = loginSock.recv(50)
         finally:
-            if response.decode('utf-8') == 'ACK':
-                connectionAck = True
-            else:
+            #TODO: analyze message similarly to how server does it
+            if response.decode('utf-8') == '00190003napster@napster.com':
+                connectionAck = False
+                #loginSock.close()
                 print('No se puedo iniciar sesión. Ingresa tus datos de nuevo')
+                loginSock.close()
+            else:
+                connectionAck = True
+    return connectionAck
