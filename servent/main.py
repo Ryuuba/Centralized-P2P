@@ -1,7 +1,6 @@
 import servent
 import os
 from threading import Thread
-import db
 from tabulate import tabulate
 
 def options_menu():
@@ -13,7 +12,7 @@ def options_menu():
             print("\nInserta el nombre de la distribución que quieres encontrar:")
             keyword = input()
             #~ Search a keyword
-            resultados = db.search_content(keyword)
+            resultados = servent.search(keyword)
             if len(resultados) >= 1:
                 #~ Print the search results
                 print(tabulate(resultados, headers=["Distro", "Version", "Archiquecture", "Size", "Target", "Name", "IP", "Port"]))
@@ -32,12 +31,12 @@ def options_menu():
             print("¿Quieres seguir usando el sistema? (s/n)" )
             if input() == 'n':
                 print("Cerrando sesión y apagando el servidor HTTP...")
-                db.close_connection()
+                #db.close_connection()
                 salir = True
 
         elif choice == "2":
             print("Cerrando sesión y apagando el servidor HTTP...")
-            db.close_connection()
+            #db.close_connection()
             salir = True
         else:
             print("La opción introducida no es válida.")

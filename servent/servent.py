@@ -5,6 +5,8 @@ from functools import partial
 from os.path import abspath
 import functools
 import requests
+import os
+from tabulate import tabulate
 
 def login_msg(user:str, password:str)->str:
     # Login message
@@ -80,3 +82,38 @@ def download_file():
     filename = input()
     #print("Obteniendo archivo...")
     getFile(ipAddress, filename, port)
+    
+def search(keyword:str) -> list[str]:
+    # Create the search message
+    msg_type = '00C8'
+    payload_lenght = "{:04d}".format(len(keyword))
+    search_msg = 'printf "' + payload_lenght + msg_type + keyword
+    search_msg = search_msg + '" | ncat localhost 6699'
+    #print(search_msg)
+    
+    #~ Execute the login line in terminal
+    search_result = os.popen(search_msg).read()
+    # print(search_result)
+    
+    if len(search_result) >= 1:
+        results = search_result.split("00c9")
+        results = format_results(results)
+        return results
+    else:
+        return search_result
+        
+def format_results(search_results:str) -> list[str]:
+    #~ Giving format to the result
+    results = []
+    for i in range(1, len(search_results)):
+        results.append(search_results[i].split(" "))
+        #~ delete the length of the payload of the results to show
+        results[i-1].pop()
+    
+    return results  
+
+              
+    #~ Print the search results
+    #print(tabulate(results, headers=["Distro", "Version", "Archiquecture", "Size", "Target", "Name", "IP", "Port"]))
+     
+        

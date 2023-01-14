@@ -169,7 +169,7 @@ def compose_search_response(keyword: list[str]):
     port = str(keyword[7])
     space = ' '
     reply.payload.append(distro + space + version + space + arch + space + size + space + 
-                         target + space + name + space + ip + space + port)
+                         target + space + name + space + ip + space + port + space)
     reply.length = len(''.join(reply.payload))
     return reply
 
