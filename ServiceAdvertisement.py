@@ -35,32 +35,69 @@ TODO:
             -read image information from filename and sha256 signature from file with ".sha256" extension
             -sha256 filename should match iso filename
             -write information to csv
+    
+    Method:
+    -csv content is replaced whenever folder is probed
+    -Read all files from shared folder but only work with isos
+        -distro name is usually first word before "-" "_" or a number
+        -version are numbers before next "-" or "_"
+        -print filename and ask user platform ("desktop, etc...)
+        -it's probably easier to ask user to input platform given the variety of names 
+
 """
 
 class ServiceAdvertisement:
 	# Constructor
-    def __init__(self, dir_path):
+    def __init__(self, dir_path, sock):
         self.dir_path = os.path.realpath(dir_path)
         self.listaArchivos = []
-        #TODO
-        #self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.sock = sock
-        
-    def searchAllFiles(self):
+        self.sock = sock
+
+    def searchFilesAndSend(self,ext):
+        #Create array that will store file info
         self.listaArchivos = []
+        #Open csv file and delete all its content
+        csvFile = open('')
+        #Extract information for every file
         for root, dirs, files in os.walk(self.dir_path):
-            print ("\n"+root+"\n")
             for file in files:
-                self.listaArchivos.append(file)
-                print ("/"+str(file))
-        return self.listaArchivos
+                correct = False
+                while correct == False:
+                    distroName = ""
+                    sha = ""
+                    filesize = ""
+                    version = ""
+                    platform = ""
+                    fileName = file
+                    #Control variables
+                    if file.endswith(".iso"):
+                        print("Analizando archivo " + file + "\n")
+                        print("Inserta el nombre de la distribución: ")
+                        distroName = input()
+                        print("Inserta la firma SHA-256: ")
+                        sha = input()
+                        filesize = os.stat(self.dir_path+"/"+str(file)).st_size
+                        print("Inserta el número de versión del sistema operativo: ")
+                        version = input()
+                        print("Inserta la plataforma del sistema operativo: ")
+                        platform = input()
+                        print("Se enviarán estos datos:\n")
+                        print("Nombre de la distribución: " + distroName
+                        + "\nFirma SHA-256: " + sha
+                        + "\nTamaño del archivo: " + filesize
+                        + " bytes\nVersión: " + version
+                        + "\nPlataforma: " + platform + 
+                        "\n¿Esto es correcto? 1. Sí     2.No")
+                        choice = input()
+                        if choice == '2':
+                            "Ingresa los datos de nuevo...\n"
+                        else:
+                            #Write info on csv
+                            print("Hola")
+            #Then send all notifications to 
 
 
-    def searchExtFiles(self,ext):
-        self.listaArchivos = []
-        for root, dirs, files in os.walk(self.dir_path):
-            print (root+"\n")
-            for file in files:
+                """
                 if file.endswith(ext):
                     sha256=""
                     arch=""
@@ -87,10 +124,12 @@ class ServiceAdvertisement:
                         while element != "-" or "_" and doneName == False:
                             distroName = distroName + element
                         doneName = True
-                        while element.isnumeric() or element == '.' and doneVersion == False:
+                        if element.isnumeric():
                             versionNumber = versionNumber + element
-                        doneVersion == True
+                        
 
+
+                            
                     metadatos = file.split("-");
                     print(metadatos)
                     distro = metadatos[0]
@@ -100,6 +139,7 @@ class ServiceAdvertisement:
                     print(pesoArchivo)
                     self.listaArchivos.append(str(file)+" "+sha256+" "+str(pesoArchivo)+" "+str(distro)+" "+str(version)+" "+str(arch))
                     print (str(file)+" "+sha256+" "+str(pesoArchivo))
+                    """
                     
         return self.listaArchivos
         
@@ -110,13 +150,9 @@ class ServiceAdvertisement:
         self.sock.sendall(data)
         self.sock.close()
 			
-
+print("Insert")
 files = ServiceAdvertisement("/home/tijuana/distribuidos/proyecto final/archivos")
 
-lista = files.searchAllFiles()
-print("Las Listas\n")
-for elemento in lista:
-    print(elemento)
     
 lista = files.searchExtFiles(".iso")
 for elemento in lista:

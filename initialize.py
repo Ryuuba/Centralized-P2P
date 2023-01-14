@@ -5,19 +5,10 @@ import threading
 import time
 import ServiceAdvertisement
 
-"""
-TODO:
-    -Check that current serialization works with server
-    -Integrate this code with other modules and test login process together with service advertisement
-    -Implement answer message parsing
-"""
-
 def run_server(route):
     #HTTP server port number should be reported back to server
     print("Inciando servidor...")
     server.mountServer(route)
-
-
 
 #Initial socket creation for login
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,37 +16,35 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #This port number is central server's listening port
 port = "6699"
 
-#As central server is run on the same machine as the servent, localhost should work. TODO: ask how this will work on production
+#As central server is run on the same machine as the servent, localhost should work. TODO: ask how this will work on production. probably hardcoded?
 server_address = ('localhost', int(port))
+#Ask for directory to be used to mount HTTP server and service advertisement
+serverDirMount = ""
 
+loginResult = initialize_login.loginToSystem(sock, server_address,port)
 #Login process. If user enters erronous information, program will quit.
-while loginResult == False:
-    if attempt == 1:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    loginResult = initialize_login.loginToSystem(sock, server_address,port)
-    if loginResult == False:
-        #Creating new socket to reconnect to server
-        attempt = 1
-print("Bienvenido al sistema de distribución de imagenes de Linux")
+if loginResult == False:
+    quit()
+else:
+    print("Bienvenido al sistema de distribución de imagenes de Linux\nIniciando proceso de notificación al servidor...")
+    print("Inserta la ruta del directorio que será usado para compartir archivos:")
+    serverDirMount = input()
+    #do service advertisement.
+    print("Proceso de notificación de servicios terminado. Iniciando servidor HTTP en " + serverDirMount)
 
 #Another thread executes this servent's server
-print("Inserta la ruta del directorio que será usado para montar el servidor HTTP")
-#This will also be used for service advertismenet
-serverDirMount = input()
 thread = threading.Thread(target=run_server, args=(serverDirMount,))
 
 #Server starts
 thread.start()
 
-#After successful login, should execute initialize_servicead
-
 #One thread should be executing initialize_cacheman
+print("Iniciando gestor de caché...")
 
-
-#After service advertisement, client shows menu and runs until user quits program
+#After service advertisement and server mount, client shows menu and runs until user quits program
 choice = "1"
 while(choice != "2"):
-    print("Elige una operación\n1. Buscar una imagen\n2. Cerrar sesión")
+    print("Elige una operación\n1. Buscar una imagen\n2. Sincronizar archivos compartidos al servidor\n3. Cerrar sesión")
     choice = input()
     if choice == "1":
         print("Inserta el nombre de la distribución que quieres encontrar:")
@@ -73,5 +62,3 @@ while(choice != "2"):
     else:
         print("La opción introducida no es válida.")
 
-#Another thread should continously probe shared folder for any changes
-#When a change is detected, servent logs in to server and redoes service advertisement
