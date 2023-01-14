@@ -18,24 +18,25 @@ def login_msg(user:str, password:str)->str:
     login_msg = 'printf "' + payload_lenght + msg_type + msg_user
     
     # Notification message
-    with open('shared_content/files.txt', 'rb') as file:
-        for line in file:
-            archivo = line.split()
-            distro = archivo[0].decode()
-            sha256 = hashlib.sha256(line.rstrip()).hexdigest()
-            size = archivo[1].decode()
-            version = archivo[2].decode()
-            arch = archivo[3].decode()
-            target = archivo[4].decode()
-            file_name = archivo[5].decode()
-            anuncio = distro + " " + sha256 + " " + size + " " + version + " " + arch + " " + target + " " + file_name
-            anuncio_lenght = "{:04d}".format(len(anuncio))
-            login_msg = login_msg + anuncio_lenght + '0064' + anuncio
+    #~ fetches files from the shared folder
+    files = os.listdir('shared_content')
+    #~ format of the name: distro#version#arch#target
+    for file in files:
+        file_split = file.split('#')
+        #file_split.pop()
+        distro = file_split[0]
+        sha256 = hashlib.sha256(file.rstrip().encode()).hexdigest()
+        size = os.stat('shared_content/'+file).st_size
+        version = file_split[1]
+        arch = file_split[2]
+        target = file_split[3]
+        anuncio = distro + " " + sha256 + " " + str(size) + " " + version + " " + arch + " " + target + " " + file
+        anuncio_lenght = "{:04d}".format(len(anuncio))
+        login_msg = login_msg + anuncio_lenght + '0064' + anuncio
             
     login_msg = login_msg + '" | ncat localhost 6699'
     
     return login_msg
-
 
 
 def mountServer(directory):
@@ -116,4 +117,44 @@ def format_results(search_results:str) -> list[str]:
     #~ Print the search results
     #print(tabulate(results, headers=["Distro", "Version", "Archiquecture", "Size", "Target", "Name", "IP", "Port"]))
      
-        
+
+def options_menu():
+    salir = False
+    while(salir != True):
+        print("\nElige una operación\n1. Buscar una imagen\n2. Cerrar sesión")
+        choice = input()
+        if choice == "1":
+            print("\nInserta el nombre de la distribución que quieres encontrar:")
+            keyword = input()
+            #~ Search a keyword
+            resultados = search(keyword)
+            if len(resultados) >= 1:
+                #~ Print the search results
+                print(tabulate(resultados, headers=["Distro", "Version", "Archiquecture", "Size", "Target", "Name", "IP", "Port"]))
+                print("\n¿Quieres descargar alguna imagen? (s/n)" )
+                if input() == 's':
+                    download_file()
+                    opcion = 's'
+                    while opcion != 'n':
+                        print("\n¿Quieres descargar otra imagen de esta busqueda? (s/n)" )
+                        opcion = input()
+                        if opcion == 's':
+                            download_file()
+            else:
+                print("Lo siento, no se encontraron resultados para esa palabra clave\n")
+            
+            print("¿Quieres seguir usando el sistema? (s/n)" )
+            if input() == 'n':
+                print("Cerrando sesión y apagando el servidor HTTP...")
+                #db.close_connection()
+                salir = True
+
+        elif choice == "2":
+            print("Cerrando sesión y apagando el servidor HTTP...")
+            #db.close_connection()
+            salir = True
+        else:
+            print("La opción introducida no es válida.")
+
+    #Another thread should continously probe shared folder for any changes
+    #When a change is detected, servent logs in to server and redoes service advertisement
