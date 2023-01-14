@@ -1,3 +1,5 @@
 .vscode
 servent/__pycache__/*.pyc
 server/__pycache__/*.pyc
+servent/shared_content/*.iso
+servent/downloaded content/*.iso
