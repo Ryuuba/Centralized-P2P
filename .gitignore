@@ -1,1 +1,3 @@
 .vscode
+servent/__pycache__/*.pyc
+server/__pycache__/*.pyc

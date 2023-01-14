@@ -171,15 +171,17 @@ class P2PServer:
         """    
         recv_msg = napster_msg.NapsterMsg()
         msg_length = client_socket.recv(4)
+        print(f'Server: message length is {msg_length}')
         if not msg_length:
             raise EOFError(' The client has closed the socket')
         msg_type = client_socket.recv(4)
+        print(f'Server: message type is {msg_type}')
         if not msg_type:
             raise EOFError(f' Message kind is missing')
         if not msg_length.decode('utf8').isnumeric():
             raise ValueError(f' Message length is not numeric {msg_length}')
-        if not msg_type.decode('utf8').isnumeric():
-            raise ValueError(f' Message type is not numeric {msg_length}')
+        if not msg_type.decode('utf8').isalnum():
+            raise ValueError(f' Message type is not numeric {msg_type}')
         recv_msg.length = int(msg_length)
         recv_msg.type = int(msg_type, base=16)
         recv_msg.payload = self.__recvall(
@@ -197,13 +199,12 @@ class P2PServer:
             else:
                 self.__record_client_content(client_socket, recv_msg)
         elif recv_msg.type == 0x00C8: # TODO implement search
-            """db_conn = DBNapsterConnector()
-            keyword_list = recv_msg.get_keyword_list()
-            result_list = db_conn.search_content(keyword_list)
-            for result in result_list:
-                reply = napster_msg.compose_response(result)
-                client_socket(reply.to_bytes())"""
-                
+            # db_conn = DBNapsterConnector()
+            # keyword_list = recv_msg.get_keyword_list()
+            # result_list = db_conn.search_content(keyword_list)
+            # for result in result_list:
+            #     reply = napster_msg.compose_response(result)
+            #     connection.sendall(reply.to_bytes())
             print(f' search protocol not implemented, yet')
             return
 
