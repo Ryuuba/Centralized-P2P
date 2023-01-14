@@ -57,8 +57,14 @@ class DBNapsterConnector:
             user_email = result[0]
         return user_email
 
-    def search_content(self, kwords: list[str]) -> list[str]:
-        pass
+    def search_content(self, kword: str) -> list[str]:
+        cursor = self.__conn.cursor()
+        cursor.execute('SELECT tblcontent.distro, tblcontent.version, tblcontent.arch, tblcontent.size, tblcontent.target, tblusercontent.url, tblusernetworkdata.ip, tblusernetworkdata.port'
+                   + ' FROM tblcontent INNER JOIN tblusercontent ON tblcontent.SHA256 = tblusercontent.SHA256 INNER JOIN tbluser ON tblusercontent.nickname = tbluser.nickname' 
+                   + ' INNER JOIN tblusernetworkdata ON tbluser.nickname = tblusernetworkdata.nickname WHERE ? IN (tblcontent.distro, tblcontent.version, tblcontent.arch, tblcontent.target)',  (kword,))
+        results = cursor.fetchall()
+        return results
+
 
     def insert_netw_data(self, user: str, ip: str, port: int):
         cursor = self.__conn.cursor()

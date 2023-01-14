@@ -2,3 +2,5 @@ Ubuntu 3826831360 22.04.1 AMD64 Desktop ubuntu-22.04.1-desktop-amd64.iso
 Raspberry 2831677672 PiOS ARM32 RaspberryPiBoard raspios-bullseye-armhf-full.img.xz
 PopOS 3134275584 22.04 AMD64 Nvidia-Desktop pop-os_22.04_amd64_nvidia_20.iso
 Fedora 2076372928 25.1 x64 Desktop Fedora-Workstation.iso
+printf "00260002alex alex0000 20041 netcat" | ncat localhost 6699
+printf "000600C8Fedora" | ncat localhost 6699

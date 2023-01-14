@@ -24,7 +24,7 @@ class NapsterMsg:
     type: int = 0x0000
     payload: list[str] = field(default_factory= lambda: [])
 
-    def get_keyword_list(self) -> list[str] | None:
+    def get_keyword_list(self) -> str | None:
         pass
 
     def to_bytes(self) -> bytes:
@@ -155,8 +155,23 @@ def compose_login_ack(user_email: str) -> NapsterMsg:
     reply.length = len(''.join(reply.payload))
     return reply
 
-def compose_search_response(keywords: str):
-    pass
+def compose_search_response(keyword: list[str]):
+    reply = NapsterMsg()
+    reply.type = 0x00C9
+    # distro (0), version(1), arch(2), size(3), target(4), name(5), ip(6), port(7) 
+    distro = keyword[0]
+    version = keyword[1]
+    arch = keyword[2]
+    size = str(keyword[3])
+    target = keyword[4]
+    name = keyword[5]
+    ip = keyword[6]
+    port = str(keyword[7])
+    space = ' '
+    reply.payload.append(distro + space + version + space + arch + space + size + space + 
+                         target + space + name + space + ip + space + port)
+    reply.length = len(''.join(reply.payload))
+    return reply
 
 if __name__ == '__main__':
     msg = NapsterMsg()
