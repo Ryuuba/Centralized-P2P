@@ -1,0 +1,22 @@
+<html>
+   <head>
+      <title>Select a MariaDB Database</title>
+   </head>
+
+   <body>
+      <?php
+         $dbhost = 'localhost:8000';
+         $dbuser = 'uriel';
+         $dbpass = '1234';
+         $conn = mysql_connect($dbhost, $dbuser, $dbpass);
+      
+         if(! $conn ) {
+            die('No se pudo hacer la conexion: ' . mysql_error());
+         }
+         echo 'Connxion exitosa';
+         
+         mysql_select_db( 'PRODUCTS' );
+         mysql_close($conn);
+      ?>
+   </body>
+</html>

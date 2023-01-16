@@ -1,0 +1,36 @@
+<html>
+   <head>
+      <title>Create a MariaDB Table</title>
+   </head>
+
+   <body>
+      <?php
+         $dbhost = 'localhost:3036';
+         $dbuser = 'uriel';
+         $dbpass = '1234';
+         $conn = mysql_connect($dbhost, $dbuser, $dbpass);
+      
+         if(! $conn ){
+            die('Could not connect: ' . mysql_error());
+         }
+         echo 'Connected successfully<br />';
+         
+         $sql = "CREATE TABLE products_tbl( ".
+            "product_id INT NOT NULL AUTO_INCREMENT, ".
+            "product_name VARCHAR(100) NOT NULL, ".
+            "product_manufacturer VARCHAR(40) NOT NULL, ".
+            "submission_date DATE, ".
+            "PRIMARY KEY ( product_id )); ";
+      
+         mysql_select_db( 'PRODUCTS' );
+         $retval = mysql_query( $sql, $conn );
+      
+         if(! $retval ) {
+            die('No se puede crear la tabla: ' . mysql_error());
+         }
+         echo "Table created successfully\n";
+         
+         mysql_close($conn);
+      ?>
+   </body>
+</html>

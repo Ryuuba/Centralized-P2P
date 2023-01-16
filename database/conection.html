@@ -1,0 +1,25 @@
+<html>
+   <head>
+      <title>Conexion con MariaDB Server</title>
+   </head>
+
+   <body>
+        <h1>Conexion usando MariaDB</h1>
+      <?php
+         $dbhost = 'localhost';
+         $dbuser = 'uriel';
+         $dbpass = '1234';
+         $conn = mysql_connect($dbhost, $dbuser, $dbpass);
+         if(! $conn ) {
+            die('No se pudo establecer la conexion: ' . mysql_error());
+         }
+
+         else{
+            echo "Conexion exitosa";
+         }
+         
+
+         mysql_close($conn);
+      ?>
+   </body>
+</html>

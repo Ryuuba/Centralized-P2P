@@ -3,13 +3,6 @@ from socket   import *
 import socket
 
 
-'''diccionario = {
-  "Direccion": "",
-  "Puerto": 27,
-  "Estado": 1003882
-}
-print(diccionario)
-'''
 
 def recvall(sock, length):
     data = b''
