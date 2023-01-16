@@ -7,6 +7,12 @@ import functools
 import requests
 import os
 from tabulate import tabulate
+import cache_manager
+import uuid
+from random import randint
+
+# Inicializa la memoria cache
+cache = cache_manager.start()
 
 def login_msg(user:str, password:str)->str:
     # Login message
@@ -64,15 +70,13 @@ def mountServer(directory):
 def getFile(ipAddress, filename, port):
     argument = 'http://' + ipAddress + ':' + port + '/' + filename
     r = requests.get(argument, stream=True)
-    route = 'downloaded content\\'+ filename
+    route = 'shared_content\\'+ filename
     with open(route, 'wb') as fd:
         for chunk in r.iter_content(chunk_size=128):
             fd.write(chunk)
     print('Archivo guardado correctamente.\n')
+    #cache_manager.print_cache()
     
-    # Guarda el resultado de la petición
-    #peticion ={}
-    #cache, respuesta = buscar.search(cache, peticion)
     
 def download_file():
     print("Inserta la dirección IP: ")
@@ -84,21 +88,33 @@ def download_file():
     #print("Obteniendo archivo...")
     getFile(ipAddress, filename, port)
     
+    
 def search(keyword:str) -> list[str]:
     # Create the search message
     msg_type = '00C8'
     payload_lenght = "{:04d}".format(len(keyword))
     search_msg = 'printf "' + payload_lenght + msg_type + keyword
     search_msg = search_msg + '" | ncat localhost 6699'
-    #print(search_msg)
     
     #~ Execute the login line in terminal
     search_result = os.popen(search_msg).read()
-    # print(search_result)
     
     if len(search_result) >= 1:
         results = search_result.split("00c9")
         results = format_results(results)
+        
+        for i in range(len(results)):
+            answer = {}
+            answer["Filename"] = results[i][5]
+            answer["IP"]= results[i][6]
+            answer["Port"]= results[i][7]
+            answer["Tiempo"]= randint(200,300)
+            # Crea el identificador único de la respuesta (Se remplazara por la IP )
+            identificador_respuesta = uuid.uuid4().hex[:8]
+            # Guarda la respuesta en la memoria caché
+            cache_manager.insert(identificador_respuesta, answer)
+        
+        #cache_manager.print_cache()
         return results
     else:
         return search_result
@@ -112,7 +128,6 @@ def format_results(search_results:str) -> list[str]:
         results[i-1].pop()
     
     return results  
-
               
     #~ Print the search results
     #print(tabulate(results, headers=["Distro", "Version", "Archiquecture", "Size", "Target", "Name", "IP", "Port"]))

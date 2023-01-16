@@ -58,4 +58,4 @@ def content():
 def print_cache():
     """ Esta función imprime el conenido de la memoria caché del servent."""
     for respuesta in list(cache_manager):
-        print(cache_manager[respuesta]["Filename"],cache_manager[respuesta]["Tiempo"])
+        print(cache_manager[respuesta]["Filename"],cache_manager[respuesta]["IP"],cache_manager[respuesta]["Port"],cache_manager[respuesta]["Tiempo"])
