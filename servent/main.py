@@ -24,6 +24,12 @@ if __name__ == '__main__':
         #Server starts and die if the main thread die
         thread = Thread(target=servent.mountServer, args=("shared_content/",))
         thread.daemon = True
-        thread.start()  
+        thread.start()
+        
+        #continuously checks the shared folder
+        files_first_time = os.listdir('shared_content')
+        thread = Thread(target=servent.check_shared_folder, args=(len(files_first_time), user, password,))
+        thread.daemon = True
+        thread.start() 
 
         servent.options_menu()

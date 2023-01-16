@@ -10,6 +10,7 @@ from tabulate import tabulate
 import cache_manager
 import uuid
 from random import randint
+import time
 
 # Inicializa la memoria cache
 cache = cache_manager.start()
@@ -168,8 +169,26 @@ def options_menu():
             print("Cerrando sesión y apagando el servidor HTTP...")
             #db.close_connection()
             salir = True
+        elif choice == "":
+            pass
         else:
             print("La opción introducida no es válida.")
 
-    #Another thread should continously probe shared folder for any changes
-    #When a change is detected, servent logs in to server and redoes service advertisement
+    
+def check_shared_folder(number:int, user:str, password:str):
+    while True:
+        files = os.listdir('shared_content')
+        number_files = len(files)
+        if number_files != number:
+            number = number_files
+            #~ Loging message
+            msg = login_msg(user, password)
+            #~ Execute the login line in terminal
+            resultado_login = os.popen(msg).read()
+            if resultado_login == '00190003napster@napster.com':
+                print("Error al actualizar los archivos compartidos\n")
+            else:
+                print("Se actualizaron los archivos compartidos en el servidor, presiona enter...")
+        else:
+            time.sleep(5) # Sleep for 5 seconds
+ 
