@@ -12,7 +12,7 @@ import functools
 
 
 def mountServer(directory):
-    hostname='localhost' #this might change, need to check
+    hostname='172.30.5.33' #this might change, need to check
     dir = abspath(directory)
     print("Montando servidor en directorio: ", directory)
     Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=dir)

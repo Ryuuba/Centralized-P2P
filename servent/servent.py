@@ -12,6 +12,7 @@ import uuid
 from random import randint
 import time
 import socket
+import urllib.parse
 
 # Inicializa la memoria cache
 cache = cache_manager.start()
@@ -42,7 +43,7 @@ def login_msg(user:str, password:str)->str:
         anuncio_lenght = "{:04d}".format(len(anuncio))
         login_msg = login_msg + anuncio_lenght + '0064' + anuncio
             
-    login_msg = login_msg + '" | ncat localhost 6699'
+    login_msg = login_msg + '" | ncat 172.30.5.59 6699'
     
     return login_msg
 
@@ -54,7 +55,7 @@ def mountServer(directory):
     estará ejecutando en un su propio hilo. 
     """
 
-    hostname='localhost' #this might change, need to check
+    hostname='172.30.5.33' #this might change, need to check
     dir = abspath(directory)
     #print("Montando servidor en directorio: ", directory)
     Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=dir)
@@ -70,8 +71,9 @@ def mountServer(directory):
     
     
 def getFile(ipAddress, filename, port):
-    argument = 'http://' + ipAddress + ':' + port + '/' + filename
+    argument ='http://' + ipAddress + ':' + port + '/' + urllib.parse.quote(filename)
     r = requests.get(argument, stream=True)
+    print(argument)
     route = 'shared_content\\'+ filename
     with open(route, 'wb') as fd:
         for chunk in r.iter_content(chunk_size=128):
@@ -96,7 +98,7 @@ def search(keyword:str) -> list[str]:
     msg_type = '00C8'
     payload_lenght = "{:04d}".format(len(keyword))
     search_msg = 'printf "' + payload_lenght + msg_type + keyword
-    search_msg = search_msg + '" | ncat localhost 6699'
+    search_msg = search_msg + '" | ncat 172.30.5.59 6699'
     
     #~ Execute the login line in terminal
     search_result = os.popen(search_msg).read()

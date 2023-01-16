@@ -16,6 +16,8 @@ if __name__ == '__main__':
     #~ Execute the login line in terminal
     resultado_login = os.popen(login_msg).read()
     
+    print(resultado_login)
+    
     if resultado_login == '00190003napster@napster.com':
         print("Ingresa un usuario y contraseña validos\n")
     else:
