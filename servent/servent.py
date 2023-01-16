@@ -11,6 +11,7 @@ import cache_manager
 import uuid
 from random import randint
 import time
+import socket
 
 # Inicializa la memoria cache
 cache = cache_manager.start()
@@ -191,4 +192,16 @@ def check_shared_folder(number:int, user:str, password:str):
                 print("Se actualizaron los archivos compartidos en el servidor, presiona enter...")
         else:
             time.sleep(5) # Sleep for 5 seconds
+            
+def check_connection(ip, port) -> bool:
+    s = socket.socket()
+    try:
+        print(f"Connecting to {ip}:{port}")
+        s.connect((ip, port))
+    except socket.error as msg:
+        #print(f"Failed to connect: {msg}")
+        return False
+    else:
+        #print(f"Successfully connected to {ip}:{port}")
+        return True
  

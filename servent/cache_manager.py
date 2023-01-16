@@ -1,5 +1,7 @@
 from threading import Thread
 import time
+import servent
+from random import randint
 
 # Se inicializa la memoria caché como una colección
 cache_manager = {}
@@ -11,8 +13,12 @@ def revisa_tiempo():
         if cache_manager[respuesta]["Tiempo"] >= 1:
             cache_manager[respuesta]["Tiempo"] -= 1
         elif cache_manager[respuesta]["Tiempo"] == 0:
-            # La respuesta tiene un tiempo de vida
-            del(cache_manager[respuesta])
+            # Revisa si el servent que tiene el archivo aun esta conectado
+            connection = servent.check_connection(cache_manager[respuesta]["IP"],int(cache_manager[respuesta]["Port"]))
+            if connection == False:
+                del(cache_manager[respuesta])
+            else:
+                cache_manager[respuesta]["Tiempo"] = randint(200,300)
 
 # Función que se ejecuta de fondo para estar revisando la memoria caché
 def ciclo_infinito():
