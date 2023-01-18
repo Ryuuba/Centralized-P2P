@@ -19,7 +19,7 @@ import socketserver
 import webbrowser
 import shutil
 
-def listaArchivos(path:str) -> list[str]:
+def listaArchivos(sock: socket.socket,path:str) -> list[str]:
         lista = []
         contenido = os.listdir(path)
         print("Entro a la lista de archivos")
@@ -126,13 +126,7 @@ def enviarArchivoServidor(sock: socket.socket, directorio: str):
             
             #file.close()
     
-def descargarArchivo(user_path: str,raiz: list[str]):
-        # crear el http request
-        # Las funciones parciales nos permiten fijar un cierto número de
-        # argumentos de una función y generar una nueva función.
-        #Handler = functools.partial(http.server.SimpleHTTPRequestHandler, user_path)
-        #print("Handler: "+ str(Handler))
-
+def descargarArchivo(sock: socket.socket,user_path: str,raiz: list[str]):
         #elemento = raiz.split()
         nombre_cont = ""
         ip_cont = raiz[6]
@@ -154,33 +148,37 @@ def descargarArchivo(user_path: str,raiz: list[str]):
         print(port_cont)
         print("Nombre del archivo: ")
         print(nombre_cont)
-        print(user_path)
+        #print(user_path)
         #print()
-        
 
-        complet_path ='http://' +ip_cont + ':' + port_cont + user_path + '/' + nombre_cont
+        #complet_path ='http://' +ip_cont + ':' + port_cont + user_path + '/' + nombre_cont
+        complet_path ='http://' +ip_cont + ':' + port_cont + '/' + nombre_cont
         print("el path completo es: ")
         print(complet_path)
         #direccionHTTP  = abspath(complet_path)
 
+        
+        #print(response.raw)
         response = requests.get(complet_path,stream=True)
-        with open(nombre_cont,'wb') as out_file :
+        with open(nombre_cont,'wb') as out_file:
             shutil.copyfileobj(response.raw,out_file)
         del response
-
+        
 def compartirCarpeta(sock: socket.socket,directorio:str):
     # assigning the appropriate port value
     PORT = 20041
     #20041
     # this finds the name of the computer user
     #os.environ['HOME']
-
-    IP = socket.gethostbyname(socket.gethostname())
+    #IP = socket.gethostbyname(socket.gethostname())
+    IP = sock.getsockname()[0]
+    print(IP)
+    #print(sock.getsockname()[0])
     # changing the directory to access the files desktop
     # with the help of os module
     direccion = abspath(directorio)
     #print(directorio)
-    #                    '/home/uriel/Documentos/Distribuciones')
+    #      '/home/uriel/Documentos/Distribuciones')
     #os.chdir(desktop)
 
     Handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=direccion)
@@ -189,7 +187,8 @@ def compartirCarpeta(sock: socket.socket,directorio:str):
     # which Python interpreter is executed
     httpd = http.server.HTTPServer((IP,PORT), Handler, False)
     httpd.server_bind()
-    address="http://%s:%d" % (httpd.server_name, httpd.server_port)
+    address="http://%s:%d" % (IP, httpd.server_port)
+    print(httpd.server_name)
     print(httpd)
 
     httpd.server_activate()
